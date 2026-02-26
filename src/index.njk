@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wakala Cleaning Services | Roll-Offs & More</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Teko for heavy industrial headers, Manrope for clean legible body -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=Teko:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Netlify Identity Widget for Decap CMS Login -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+
+<body>
+
+    <div class="bg-container">
+        <!-- 0: Intro -->
+        <div class="bg-image bg-0"
+            style="background-image: url('https://images.unsplash.com/photo-1541888087525-ecab1887a032?auto=format&fit=crop&w=2000&q=80')">
+        </div>
+        <!-- 1: Dumpsters -->
+        <div class="bg-image bg-1" style="background-image: url('15_yard_dumbter.jpg')"></div>
+        <!-- 2: Trailers -->
+        <div class="bg-image bg-2" style="background-image: url('Trailer_Rental.jpg')"></div>
+        <!-- 3: Pressure Washing -->
+        <div class="bg-image bg-3"
+            style="background-image: url('https://images.unsplash.com/photo-1542038383-75fcce50616b?auto=format&fit=crop&w=2000&q=80')">
+        </div>
+        <!-- 4: Handyman -->
+        <div class="bg-image bg-4"
+            style="background-image: url('https://images.unsplash.com/photo-1581141849291-1125c7b692b5?auto=format&fit=crop&w=2000&q=80')">
+        </div>
+        <!-- 5: Yard Cleanups -->
+        <div class="bg-image bg-5"
+            style="background-image: url('https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=2000&q=80')">
+        </div>
+        <!-- 6: Remodels -->
+        <div class="bg-image bg-6"
+            style="background-image: url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=2000&q=80')">
+        </div>
+        <!-- 7: Payment / Outro -->
+        <div class="bg-image bg-7"
+            style="background-image: url('https://images.unsplash.com/photo-1621844280145-af47fbfff552?auto=format&fit=crop&w=2000&q=80')">
+        </div>
+
+        <div class="bg-overlay-noise"></div>
+    </div>
+
+    <!-- Fixed Header Contact -->
+    <header class="fixed-nav">
+        <div class="nav-brand">WAKALA SERVICES</div>
+        <div class="nav-contact">
+            <a href="tel:9154551645">(915) 455-1645</a>
+            <a href="mailto:wakalaep915@gmail.com">wakalaep915@gmail.com</a>
+        </div>
+    </header>
+
+    <div class="content-container">
+        <!-- INTRO -->
+        <section class="story-section section-0" data-bg="bg-0">
+            <div class="text-block intro full-width">
+                <h1>{{ content.intro.title }}<br><span class="accent-text">{{ content.intro.accent }}</span></h1>
+                <p class="subtitle">{{ content.intro.subtitle }}</p>
+                <div class="scroll-indicator">
+                    <span>SCROLL TO EXPLORE</span>
+                    <div class="line"></div>
+                </div>
+            </div>
+        </section>
+
+        {% for service in content.services %}
+        {% set index = loop.index %}
+        {% set alignment = "right" if index % 2 != 0 else "left border-accent" %}
+        
+        <!-- SERVICE {{ index }} -->
+        <section class="story-section section-{{ index }}" data-bg="bg-{{ index }}">
+            <div class="text-block {{ alignment }} solid-panel">
+                <div class="panel-header">SERVICE 0{{ index }}</div>
+                <h2>{{ service.name }}</h2>
+                <p>{{ service.description }}</p>
+                <ul class="feature-list">
+                    {% for feature in service.features %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="cta-wrapper"><span class="simulated-link">REQUEST QUOTE &rarr;</span></div>
+            </div>
+        </section>
+        {% endfor %}
+
+        <!-- Booking & Payment Panel -->
+        <section class="story-section section-7 footer-booking" data-bg="bg-7">
+            <div class="text-block center booking-panel">
+                <h2>{{ content.booking.title }}</h2>
+                <p>{{ content.booking.subtitle }}</p>
+
+                <form class="payment-form" id="bookingForm"
+                    onsubmit="event.preventDefault(); document.getElementById('successMsg').style.display='block';">
+                    <div class="form-row">
+                        <input type="text" placeholder="Full Name" required>
+                        <input type="tel" placeholder="Phone Number" required>
+                    </div>
+                    <div class="form-row">
+                        <select required>
+                            <option value="">Select a Service</option>
+                            <option value="dumpster">15-Yard Dumpster Rental</option>
+                            <option value="dumpster20">20-Yard Dumpster Rental</option>
+                            <option value="trailer">Trailer Rental</option>
+                            <option value="pressure">Pressure Washing</option>
+                            <option value="handyman">Handyman Services</option>
+                            <option value="yard">Yard Clean-Up</option>
+                            <option value="remodel">Small Remodel</option>
+                        </select>
+                    </div>
+                    <div class="form-row payment-details">
+                        <input type="text" placeholder="Card Number (Mockup)" required>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" placeholder="MM/YY" required>
+                        <input type="text" placeholder="CVC" required>
+                    </div>
+                    <button type="submit" class="pay-btn">SECURE BOOKING &bull; PAY NOW</button>
+                    <p id="successMsg"
+                        style="display:none; color: var(--accent-color); font-weight: bold; margin-top: 1rem;">Payment
+                        Successful! We will contact you shortly.</p>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on("init", user => {
+          if (!user) {
+            window.netlifyIdentity.on("login", () => {
+              document.location.href = "/admin/";
+            });
+          }
+        });
+      }
+    </script>
+</body>
+
+</html>

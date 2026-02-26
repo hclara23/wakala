@@ -1,0 +1,40 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "src/images"
+public_folder: "/images"
+
+collections:
+  - name: "content"
+    label: "Site Content"
+    files:
+      - file: "src/_data/content.json"
+        label: "Home Page Content"
+        name: "home"
+        fields:
+          - label: "Intro Section"
+            name: "intro"
+            widget: "object"
+            fields:
+              - {label: "Main Title", name: "title", widget: "string"}
+              - {label: "Accent Text", name: "accent", widget: "string"}
+              - {label: "Subtitle", name: "subtitle", widget: "string"}
+          
+          - label: "Services"
+            name: "services"
+            widget: "list"
+            fields:
+              - {label: "Service Name", name: "name", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+              - label: "Features"
+                name: "features"
+                widget: "list"
+                field: {label: "Feature Item", name: "feature", widget: "string"}
+          
+          - label: "Booking Section"
+            name: "booking"
+            widget: "object"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Subtitle", name: "subtitle", widget: "string"}
