@@ -9,7 +9,7 @@ collections:
   - name: "content"
     label: "Site Content"
     files:
-      - file: "src/_data/content.json"
+      - file: "src/_data/siteContent.json"
         label: "Home Page Content"
         name: "home"
         fields:

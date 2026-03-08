@@ -91,8 +91,8 @@
         <section class="story-section section-0" data-bg="bg-0">
             <div class="text-block intro full-width">
                 <img class="hero-logo" src="{{ site.logo }}" alt="{{ site.name }} logo" width="320" height="320" decoding="async" loading="eager">
-                <h1>{{ content.intro.title }}<br><span class="accent-text">{{ content.intro.accent }}</span></h1>
-                <p class="subtitle">{{ content.intro.subtitle }}</p>
+                <h1>{{ siteContent.intro.title }}<br><span class="accent-text">{{ siteContent.intro.accent }}</span></h1>
+                <p class="subtitle">{{ siteContent.intro.subtitle }}</p>
                 <div class="scroll-indicator">
                     <span>SCROLL TO EXPLORE</span>
                     <div class="line"></div>
@@ -100,7 +100,7 @@
             </div>
         </section>
 
-        {% for service in content.services %}
+        {% for service in siteContent.services %}
         {% set index = loop.index %}
         {% set alignment = "right" if index % 2 != 0 else "left border-accent" %}
         
@@ -123,8 +123,8 @@
         <!-- Booking & Payment Panel -->
         <section id="booking" class="story-section section-7 footer-booking" data-bg="bg-7">
             <div class="text-block center booking-panel">
-                <h2>{{ content.booking.title }}</h2>
-                <p>{{ content.booking.subtitle }}</p>
+                <h2>{{ siteContent.booking.title }}</h2>
+                <p>{{ siteContent.booking.subtitle }}</p>
 
                 <form class="payment-form" id="bookingForm" name="booking" method="POST" data-netlify="true"
                     netlify-honeypot="bot-field" action="/thank-you/">
@@ -166,8 +166,8 @@
                 </form>
                 <div class="payment-actions">
                     <button type="button" class="pay-btn stripe-checkout"
-                        data-item="{{ content.booking.payment_item }}">{{ content.booking.payment_cta }}</button>
-                    <p class="form-note">{{ content.booking.payment_note }}</p>
+                        data-item="{{ siteContent.booking.payment_item }}">{{ siteContent.booking.payment_cta }}</button>
+                    <p class="form-note">{{ siteContent.booking.payment_note }}</p>
                     <p class="payment-error" role="alert" aria-live="polite"></p>
                 </div>
             </div>
