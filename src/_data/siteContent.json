@@ -42,5 +42,13 @@
     "payment_cta": "Pay $300 Dumpster Reservation",
     "payment_note": "Secure checkout via Stripe. This is the full $300 payment for a 3-day dumpster rental.",
     "payment_item": "dumpster_15"
+  },
+  "calendar": {
+    "title": "AVAILABILITY CALENDAR",
+    "subtitle": "Check open dates before you book. The calendar updates in real time."
+  },
+  "blog": {
+    "title": "LATEST UPDATES",
+    "subtitle": "Tips, project highlights, and local service updates."
   }
 }

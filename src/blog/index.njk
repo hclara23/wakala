@@ -1,0 +1,104 @@
+---
+title: "Blog"
+description: "Updates, project highlights, and tips from Wakala Cleaning Services."
+permalink: /blog/index.html
+tags: []
+---
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} | {{ site.name }}</title>
+    <meta name="description" content="{{ description }}">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="{{ site.url }}/blog/">
+    <meta property="og:title" content="{{ title }} | {{ site.name }}">
+    <meta property="og:description" content="{{ description }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site.url }}/blog/">
+    {% if site.og_image %}
+    <meta property="og:image" content="{{ site.og_image }}">
+    {% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ title }} | {{ site.name }}">
+    <meta name="twitter:description" content="{{ description }}">
+    {% if site.og_image %}
+    <meta name="twitter:image" content="{{ site.og_image }}">
+    {% endif %}
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=Teko:wght@400;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <div class="bg-container">
+        <div class="bg-image bg-0"></div>
+        <div class="bg-overlay-noise"></div>
+    </div>
+
+    <header class="fixed-nav" role="banner">
+        <div class="nav-brand">{{ site.name }}</div>
+        <nav class="nav-contact" aria-label="Contact">
+            <a href="tel:{{ site.phone }}">{{ site.phone_display }}</a>
+            <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+        </nav>
+    </header>
+
+    <main id="main-content" class="content-container">
+        <section class="story-section blog-hero">
+            <div class="text-block intro full-width">
+                <h1>BLOG<br><span class="accent-text">UPDATES</span></h1>
+                <p class="subtitle">{{ description }}</p>
+            </div>
+        </section>
+
+        <section class="story-section">
+            <div class="text-block right solid-panel">
+                <div class="panel-header">LATEST</div>
+                <h2>Recent Posts</h2>
+                <div class="blog-grid">
+                    {% for post in collections.blog | reverse %}
+                    <article class="blog-card">
+                        {% if post.data.hero_image %}
+                        <div class="blog-card-image">
+                            <img src="{{ post.data.hero_image }}" alt="{{ post.data.title }}" loading="lazy">
+                        </div>
+                        {% endif %}
+                        <div class="blog-card-body">
+                            <h3>{{ post.data.title }}</h3>
+                            <p>{{ post.data.excerpt }}</p>
+                            <a class="simulated-link" href="{{ post.url }}">Read More &rarr;</a>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                <div class="cta-wrapper">
+                    <a class="simulated-link" href="/">Back to Home &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">{{ site.name }}</div>
+                <div class="footer-meta">Serving {{ site.area_served }}</div>
+                <div class="footer-contact">
+                    <a href="tel:{{ site.phone }}">{{ site.phone_display }}</a>
+                    <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+                    <a href="/admin/">Admin Login</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="/script.js" defer></script>
+</body>
+
+</html>

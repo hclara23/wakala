@@ -120,6 +120,60 @@
         </section>
         {% endfor %}
 
+        {% if site.calendar_embed_url %}
+        <section class="story-section section-calendar" data-bg="bg-7">
+            <div class="text-block left solid-panel border-accent calendar-panel">
+                <div class="panel-header">AVAILABILITY</div>
+                <h2>{{ siteContent.calendar.title }}</h2>
+                <p>{{ siteContent.calendar.subtitle }}</p>
+                <div class="calendar-embed">
+                    <iframe
+                        title="Wakala availability calendar"
+                        src="{{ site.calendar_embed_url }}"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        frameborder="0"
+                        scrolling="no"></iframe>
+                </div>
+                <div class="cta-wrapper">
+                    <a class="simulated-link" href="{{ site.calendar_public_url }}" target="_blank" rel="noopener">Open Calendar &rarr;</a>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="story-section section-blog" data-bg="bg-7">
+            <div class="text-block right solid-panel">
+                <div class="panel-header">BLOG</div>
+                <h2>{{ siteContent.blog.title }}</h2>
+                <p>{{ siteContent.blog.subtitle }}</p>
+                {% set posts = collections.blog | reverse | slice(0, 3) %}
+                {% if posts.length %}
+                <div class="blog-grid">
+                    {% for post in posts %}
+                    <article class="blog-card">
+                        {% if post.data.hero_image %}
+                        <div class="blog-card-image">
+                            <img src="{{ post.data.hero_image }}" alt="{{ post.data.title }}" loading="lazy">
+                        </div>
+                        {% endif %}
+                        <div class="blog-card-body">
+                            <h3>{{ post.data.title }}</h3>
+                            <p>{{ post.data.excerpt }}</p>
+                            <a class="simulated-link" href="{{ post.url }}">Read More &rarr;</a>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>No posts yet. Check back soon.</p>
+                {% endif %}
+                <div class="cta-wrapper">
+                    <a class="simulated-link" href="/blog/">View All Posts &rarr;</a>
+                </div>
+            </div>
+        </section>
+
         <!-- Booking & Payment Panel -->
         <section id="booking" class="story-section section-7 footer-booking" data-bg="bg-7">
             <div class="text-block center booking-panel">
@@ -179,6 +233,7 @@
                 <div class="footer-contact">
                     <a href="tel:{{ site.phone }}">{{ site.phone_display }}</a>
                     <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+                    <a href="/admin/">Admin Login</a>
                 </div>
             </div>
         </footer>

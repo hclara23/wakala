@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} | {{ site.name }}</title>
+    <meta name="description" content="{{ excerpt }}">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+    <meta property="og:title" content="{{ title }} | {{ site.name }}">
+    <meta property="og:description" content="{{ excerpt }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+    {% if hero_image %}
+    <meta property="og:image" content="{{ site.url }}{{ hero_image }}">
+    {% else %}
+    <meta property="og:image" content="{{ site.og_image }}">
+    {% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ title }} | {{ site.name }}">
+    <meta name="twitter:description" content="{{ excerpt }}">
+    {% if hero_image %}
+    <meta name="twitter:image" content="{{ site.url }}{{ hero_image }}">
+    {% else %}
+    <meta name="twitter:image" content="{{ site.og_image }}">
+    {% endif %}
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=Teko:wght@400;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <div class="bg-container">
+        <div class="bg-image bg-0"></div>
+        <div class="bg-overlay-noise"></div>
+    </div>
+
+    <header class="fixed-nav" role="banner">
+        <div class="nav-brand">{{ site.name }}</div>
+        <nav class="nav-contact" aria-label="Contact">
+            <a href="tel:{{ site.phone }}">{{ site.phone_display }}</a>
+            <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+        </nav>
+    </header>
+
+    <main id="main-content" class="content-container">
+        <section class="story-section blog-hero">
+            <div class="text-block intro full-width">
+                <h1>{{ title }}<br><span class="accent-text">INSIGHTS</span></h1>
+                <p class="subtitle">{{ excerpt }}</p>
+            </div>
+        </section>
+
+        <section class="story-section">
+            <div class="text-block left solid-panel border-accent blog-post-panel">
+                {% if hero_image %}
+                <div class="blog-post-hero">
+                    <img src="{{ hero_image }}" alt="{{ title }}">
+                </div>
+                {% endif %}
+                <div class="blog-post-content">
+                    {{ content | safe }}
+                </div>
+                <div class="cta-wrapper">
+                    <a class="simulated-link" href="/blog/">Back to Blog &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">{{ site.name }}</div>
+                <div class="footer-meta">Serving {{ site.area_served }}</div>
+                <div class="footer-contact">
+                    <a href="tel:{{ site.phone }}">{{ site.phone_display }}</a>
+                    <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+                    <a href="/admin/">Admin Login</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="/script.js" defer></script>
+</body>
+
+</html>

@@ -30,6 +30,11 @@ eleventyExcludeFromCollections: true
                 If you need us sooner, call <a href="tel:{{ site.phone }}">{{ site.phone_display }}</a> or email
                 <a href="mailto:{{ site.email }}">{{ site.email }}</a>.
             </p>
+            {% if site.calendar_public_url %}
+            <p class="thank-you-copy">
+                View current availability on our <a href="{{ site.calendar_public_url }}" target="_blank" rel="noopener">booking calendar</a>.
+            </p>
+            {% endif %}
             <div class="cta-wrapper thank-you-actions">
                 <a class="simulated-link" href="/">Return to home &rarr;</a>
             </div>

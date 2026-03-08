@@ -41,6 +41,18 @@ collections:
               - {label: "Payment Button Text", name: "payment_cta", widget: "string"}
               - {label: "Payment Note", name: "payment_note", widget: "string"}
               - {label: "Payment Item Key", name: "payment_item", widget: "string"}
+          - label: "Calendar Section"
+            name: "calendar"
+            widget: "object"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Subtitle", name: "subtitle", widget: "string"}
+          - label: "Blog Section"
+            name: "blog"
+            widget: "object"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Subtitle", name: "subtitle", widget: "string"}
   - name: "settings"
     label: "Site Settings"
     files:
@@ -59,3 +71,18 @@ collections:
           - {label: "OG Image URL", name: "og_image", widget: "string"}
           - {label: "Google Business URL", name: "google_business_url", widget: "string"}
           - {label: "Logo Path", name: "logo", widget: "string"}
+          - {label: "Calendar Embed URL", name: "calendar_embed_url", widget: "string"}
+          - {label: "Calendar Public URL", name: "calendar_public_url", widget: "string"}
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "src/blog"
+    create: true
+    slug: "{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Date", name: "date", widget: "datetime"}
+      - {label: "Excerpt", name: "excerpt", widget: "text"}
+      - {label: "Hero Image", name: "hero_image", widget: "image", required: false}
+      - {label: "Body", name: "body", widget: "markdown"}

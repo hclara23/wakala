@@ -7,4 +7,12 @@ eleventyExcludeFromCollections: true
   <url>
     <loc>{{ site.url }}/</loc>
   </url>
+  <url>
+    <loc>{{ site.url }}/blog/</loc>
+  </url>
+  {% for post in collections.blog %}
+  <url>
+    <loc>{{ site.url }}{{ post.url }}</loc>
+  </url>
+  {% endfor %}
 </urlset>
