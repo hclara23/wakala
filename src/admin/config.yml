@@ -58,3 +58,4 @@ collections:
           - {label: "Service Area", name: "area_served", widget: "string"}
           - {label: "OG Image URL", name: "og_image", widget: "string"}
           - {label: "Google Business URL", name: "google_business_url", widget: "string"}
+          - {label: "Logo Path", name: "logo", widget: "string"}

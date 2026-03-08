@@ -55,6 +55,18 @@ if (!prefersReducedMotion) {
         }
     });
 
+    // Logo fade as soon as scroll begins
+    gsap.to(".hero-logo", {
+        opacity: 0,
+        y: -30,
+        scrollTrigger: {
+            trigger: ".section-0",
+            start: "top top",
+            end: "top+=200",
+            scrub: true
+        }
+    });
+
     // 3. Background Crossfading tied to sections
     const sections = gsap.utils.toArray('.story-section');
     sections.forEach((section) => {
