@@ -38,6 +38,9 @@
   ],
   "booking": {
     "title": "READY TO START?",
-    "subtitle": "Reserve your dumpster $300 for 3 days or book a quote for your project."
+    "subtitle": "Request a quote or reserve a dumpster. We'll confirm availability and send a secure payment link.",
+    "payment_cta": "Pay $300 Dumpster Reservation",
+    "payment_note": "Secure checkout via Stripe. This is the full $300 payment for a 3-day dumpster rental.",
+    "payment_item": "dumpster_15"
   }
 }

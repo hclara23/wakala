@@ -4,7 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wakala Cleaning Services | Roll-Offs & More</title>
+    <title>{{ site.name }} | Roll-Offs & More</title>
+    <meta name="description" content="{{ site.description }}">
+    <meta name="robots" content="index,follow">
+    <meta name="theme-color" content="#050505">
+    <link rel="canonical" href="{{ site.url }}/">
+    <meta property="og:title" content="{{ site.name }} | Roll-Offs & More">
+    <meta property="og:description" content="{{ site.description }}">
+    <meta property="og:site_name" content="{{ site.name }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site.url }}/">
+    {% if site.locale %}
+    <meta property="og:locale" content="{{ site.locale }}">
+    {% endif %}
+    {% if site.og_image %}
+    <meta property="og:image" content="{{ site.og_image }}">
+    {% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ site.name }} | Roll-Offs & More">
+    <meta name="twitter:description" content="{{ site.description }}">
+    {% if site.og_image %}
+    <meta name="twitter:image" content="{{ site.og_image }}">
+    {% endif %}
+    <link rel="sitemap" type="application/xml" href="{{ site.url }}/sitemap.xml">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,54 +35,58 @@
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=Teko:wght@400;600;700&display=swap"
         rel="stylesheet">
     <!-- Netlify Identity Widget for Decap CMS Login -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js" defer></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "{{ site.name }}",
+      "url": "{{ site.url }}/",
+      "telephone": "{{ site.phone }}",
+      "email": "{{ site.email }}",
+      "areaServed": "{{ site.area_served }}",
+      "description": "{{ site.description }}",
+      "sameAs": [
+        "{{ site.google_business_url }}"
+      ]
+    }
+    </script>
 </head>
 
 <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
     <div class="bg-container">
         <!-- 0: Intro -->
-        <div class="bg-image bg-0"
-            style="background-image: url('https://images.unsplash.com/photo-1541888087525-ecab1887a032?auto=format&fit=crop&w=2000&q=80')">
-        </div>
+        <div class="bg-image bg-0"></div>
         <!-- 1: Dumpsters -->
-        <div class="bg-image bg-1" style="background-image: url('15_yard_dumbter.jpg')"></div>
+        <div class="bg-image bg-1"></div>
         <!-- 2: Trailers -->
-        <div class="bg-image bg-2" style="background-image: url('Trailer_Rental.jpg')"></div>
+        <div class="bg-image bg-2"></div>
         <!-- 3: Pressure Washing -->
-        <div class="bg-image bg-3"
-            style="background-image: url('https://images.unsplash.com/photo-1542038383-75fcce50616b?auto=format&fit=crop&w=2000&q=80')">
-        </div>
+        <div class="bg-image bg-3"></div>
         <!-- 4: Handyman -->
-        <div class="bg-image bg-4"
-            style="background-image: url('https://images.unsplash.com/photo-1581141849291-1125c7b692b5?auto=format&fit=crop&w=2000&q=80')">
-        </div>
+        <div class="bg-image bg-4"></div>
         <!-- 5: Yard Cleanups -->
-        <div class="bg-image bg-5"
-            style="background-image: url('https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=2000&q=80')">
-        </div>
+        <div class="bg-image bg-5"></div>
         <!-- 6: Remodels -->
-        <div class="bg-image bg-6"
-            style="background-image: url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=2000&q=80')">
-        </div>
+        <div class="bg-image bg-6"></div>
         <!-- 7: Payment / Outro -->
-        <div class="bg-image bg-7"
-            style="background-image: url('https://images.unsplash.com/photo-1621844280145-af47fbfff552?auto=format&fit=crop&w=2000&q=80')">
-        </div>
+        <div class="bg-image bg-7"></div>
 
         <div class="bg-overlay-noise"></div>
     </div>
 
     <!-- Fixed Header Contact -->
-    <header class="fixed-nav">
-        <div class="nav-brand">WAKALA SERVICES</div>
-        <div class="nav-contact">
-            <a href="tel:9154551645">(915) 455-1645</a>
-            <a href="mailto:wakalaep915@gmail.com">wakalaep915@gmail.com</a>
-        </div>
+    <header class="fixed-nav" role="banner">
+        <div class="nav-brand">{{ site.name }}</div>
+        <nav class="nav-contact" aria-label="Contact">
+            <a href="tel:{{ site.phone }}">{{ site.phone_display }}</a>
+            <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+        </nav>
     </header>
 
-    <div class="content-container">
+    <main id="main-content" class="content-container">
         <!-- INTRO -->
         <section class="story-section section-0" data-bg="bg-0">
             <div class="text-block intro full-width">
@@ -88,25 +114,37 @@
                     <li>{{ feature }}</li>
                     {% endfor %}
                 </ul>
-                <div class="cta-wrapper"><span class="simulated-link">REQUEST QUOTE &rarr;</span></div>
+                <div class="cta-wrapper"><a class="simulated-link" href="#booking">REQUEST QUOTE &rarr;</a></div>
             </div>
         </section>
         {% endfor %}
 
         <!-- Booking & Payment Panel -->
-        <section class="story-section section-7 footer-booking" data-bg="bg-7">
+        <section id="booking" class="story-section section-7 footer-booking" data-bg="bg-7">
             <div class="text-block center booking-panel">
                 <h2>{{ content.booking.title }}</h2>
                 <p>{{ content.booking.subtitle }}</p>
 
-                <form class="payment-form" id="bookingForm"
-                    onsubmit="event.preventDefault(); document.getElementById('successMsg').style.display='block';">
+                <form class="payment-form" id="bookingForm" name="booking" method="POST" data-netlify="true"
+                    netlify-honeypot="bot-field" action="/thank-you/">
+                    <input type="hidden" name="form-name" value="booking">
+                    <p class="sr-only">
+                        <label for="bot-field">Don't fill this out if you're human</label>
+                        <input id="bot-field" name="bot-field" type="text">
+                    </p>
                     <div class="form-row">
-                        <input type="text" placeholder="Full Name" required>
-                        <input type="tel" placeholder="Phone Number" required>
+                        <label class="sr-only" for="fullName">Full Name</label>
+                        <input id="fullName" name="fullName" type="text" placeholder="Full Name" autocomplete="name" required>
+                        <label class="sr-only" for="phone">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" placeholder="Phone Number" autocomplete="tel" required>
                     </div>
                     <div class="form-row">
-                        <select required>
+                        <label class="sr-only" for="email">Email Address</label>
+                        <input id="email" name="email" type="email" placeholder="Email Address" autocomplete="email">
+                    </div>
+                    <div class="form-row">
+                        <label class="sr-only" for="service">Select a Service</label>
+                        <select id="service" name="service" required>
                             <option value="">Select a Service</option>
                             <option value="dumpster">15-Yard Dumpster Rental</option>
                             <option value="dumpster20">20-Yard Dumpster Rental</option>
@@ -117,38 +155,38 @@
                             <option value="remodel">Small Remodel</option>
                         </select>
                     </div>
-                    <div class="form-row payment-details">
-                        <input type="text" placeholder="Card Number (Mockup)" required>
-                    </div>
                     <div class="form-row">
-                        <input type="text" placeholder="MM/YY" required>
-                        <input type="text" placeholder="CVC" required>
+                        <label class="sr-only" for="details">Project Details</label>
+                        <textarea id="details" name="details" rows="4"
+                            placeholder="Project details, preferred dates, or questions"></textarea>
                     </div>
-                    <button type="submit" class="pay-btn">SECURE BOOKING &bull; PAY NOW</button>
-                    <p id="successMsg"
-                        style="display:none; color: var(--accent-color); font-weight: bold; margin-top: 1rem;">Payment
-                        Successful! We will contact you shortly.</p>
+                    <button type="submit" class="pay-btn">REQUEST QUOTE</button>
+                    <p class="form-note">We will confirm availability and send a secure payment link.</p>
                 </form>
+                <div class="payment-actions">
+                    <button type="button" class="pay-btn stripe-checkout"
+                        data-item="{{ content.booking.payment_item }}">{{ content.booking.payment_cta }}</button>
+                    <p class="form-note">{{ content.booking.payment_note }}</p>
+                    <p class="payment-error" role="alert" aria-live="polite"></p>
+                </div>
             </div>
         </section>
-    </div>
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">{{ site.name }}</div>
+                <div class="footer-meta">Serving {{ site.area_served }}</div>
+                <div class="footer-contact">
+                    <a href="tel:{{ site.phone }}">{{ site.phone_display }}</a>
+                    <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+                </div>
+            </div>
+        </footer>
+    </main>
 
     <!-- GSAP & ScrollTrigger -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="script.js"></script>
-
-    <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on("init", user => {
-          if (!user) {
-            window.netlifyIdentity.on("login", () => {
-              document.location.href = "/admin/";
-            });
-          }
-        });
-      }
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="script.js" defer></script>
 </body>
 
 </html>
