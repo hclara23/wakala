@@ -8,7 +8,7 @@ export const site = {
     'Wakala provides roll-off dumpsters, trailer rentals, pressure washing, handyman work, yard cleanups, and small remodel support for residential and commercial projects in El Paso, Texas.',
   tagline:
     'Roll-offs, cleanup crews, and property-ready work for El Paso jobs that need fast scheduling and dependable follow-through.',
-  url: 'https://wakalapropertyservices.com',
+  url: process.env.APP_URL || 'https://wakalapropertyservices.com',
   phone: '9154551645',
   phoneDisplay: '(915) 455-1645',
   email: 'wakalaep915@gmail.com',

@@ -73,12 +73,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${manrope.variable} ${cormorant.variable}`}>
       <body className="min-h-screen bg-black font-sans text-white antialiased" suppressHydrationWarning>
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-BLMNM31MVL" strategy="afterInteractive" />
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-BLMNM31MVL');`}
+          gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');`}
         </Script>
         <script
           type="application/ld+json"
