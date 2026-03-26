@@ -1,0 +1,54 @@
+{
+  "intro": {
+    "title": "WAKALA",
+    "accent": "CLEANING SERVICES",
+    "subtitle": "Professional solutions for residential and commercial needs."
+  },
+  "services": [
+    {
+      "name": "DUMPSTER RENTALS",
+      "description": "Reliable roll-off dumpsters for construction, cleanouts, and renovations. We pride ourselves on reliability and keeping your property looking its best. Perfect for homeowners, landlords, and contractors.",
+      "features": ["15 Yard Dumpsters", "Same-Day Delivery Available", "Flat Rate Pricing"]
+    },
+    {
+      "name": "TRAILER RENTALS",
+      "description": "Heavy-duty trailers for hauling materials, equipment, or debris. We pride ourselves on reliability and keeping your property looking its best. Perfect for homeowners, landlords, and contractors.",
+      "features": ["Utility Trailers", "Dump Trailers", "Flexible Rental Periods", "Tow-Ready"]
+    },
+    {
+      "name": "PRESSURE WASHING",
+      "description": "Restore the look of your driveway, siding, and walkways. We pride ourselves on reliability and keeping your property looking its best. Perfect for homeowners, landlords, and contractors.",
+      "features": ["Driveways & Sidewalks", "House Siding", "Decks & Patios", "Commercial Fleets"]
+    },
+    {
+      "name": "HANDYMAN SERVICES",
+      "description": "Professional repairs and maintenance for your home or business. We pride ourselves on reliability and keeping your property looking its best. Perfect for homeowners, landlords, and contractors.",
+      "features": ["General Repairs", "Fixture Installation", "Drywall Patching", "Door & Window Repair"]
+    },
+    {
+      "name": "YARD CLEAN-UPS",
+      "description": "Complete property cleanup, debris removal, and landscaping prep. We pride ourselves on reliability and keeping your property looking its best. Perfect for homeowners, landlords, and contractors.",
+      "features": ["Leaf Removal", "Junk Hauling", "Overgrown Yard Clearing", "Storm Cleanup"]
+    },
+    {
+      "name": "SMALL REMODELS",
+      "description": "Kitchen and bathroom updates to increase property value. We pride ourselves on reliability and keeping your property looking its best. Perfect for homeowners, landlords, and contractors.",
+      "features": ["Bathroom Vanities", "Kitchen Backsplashes", "Flooring Updates", "Cabinet Painting"]
+    }
+  ],
+  "booking": {
+    "title": "READY TO START?",
+    "subtitle": "Request a quote or reserve a dumpster. We'll confirm availability and send a secure payment link.",
+    "payment_cta": "Pay $300 Dumpster Reservation",
+    "payment_note": "Secure checkout via Stripe. This is the full $300 payment for a 3-day dumpster rental.",
+    "payment_item": "dumpster_15"
+  },
+  "calendar": {
+    "title": "AVAILABILITY CALENDAR",
+    "subtitle": "Check open dates before you book. The calendar updates in real time."
+  },
+  "blog": {
+    "title": "LATEST UPDATES",
+    "subtitle": "Tips, project highlights, and local service updates."
+  }
+}
