@@ -20,6 +20,47 @@ export const site = {
   quoteLabel: 'Call for a quote',
 } as const;
 
+export const serviceRegions = [
+  { name: 'West El Paso', slug: 'west-el-paso' },
+  { name: 'East Side', slug: 'east-side' },
+  { name: 'Northeast', slug: 'northeast' },
+  { name: 'El Paso General', slug: 'el-paso' },
+] as const;
+
+export type Review = {
+  author: string;
+  rating: number;
+  text: string;
+  date: string;
+};
+
+export const reviews: Review[] = [
+  {
+    author: 'Gabby Thomas',
+    rating: 5,
+    text: 'Amazing, they saved me in a pinch! I needed to get a washing machine picked up and installed and the old one hauled away. They got it done same day and quickly! Customer service was amazing!',
+    date: '2 weeks ago',
+  },
+  {
+    author: 'Sal Vazquez',
+    rating: 5,
+    text: 'Great service and most importantly great and very modest pricing !!!',
+    date: '2 weeks ago',
+  },
+  {
+    author: 'Victor Ranjel Ayala',
+    rating: 5,
+    text: 'Awesome services, they take care and maintain my yard every month. I highly recommend using walls for all cleaning services.',
+    date: '1 week ago',
+  },
+  {
+    author: 'John Malmquist',
+    rating: 5,
+    text: 'Wakala provides dependable property support and fast coordination. Highly recommended for dumpster rentals and cleanup work.',
+    date: '2 weeks ago',
+  },
+] as const;
+
 export const navigation = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },

@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { ArrowUpRight, Mail, Phone } from 'lucide-react';
-import { navigation, site } from '@/lib/site-data';
+import { navigation, serviceRegions, site } from '@/lib/site-data';
 
 export default function SiteFooter() {
   return (
     <footer className="border-t border-white/10 bg-black">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-[1.5fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-[1.5fr_0.8fr_0.8fr_0.9fr]">
         <div className="space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.45em] text-amber-300/80">
             {site.shortName}
@@ -43,6 +43,19 @@ export default function SiteFooter() {
             <Link href="/privacy" className="mt-3 block transition hover:text-white">
               Privacy Policy
             </Link>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-200">
+            Service Areas
+          </h3>
+          <div className="space-y-3 text-sm text-stone-300">
+            {serviceRegions.map((region) => (
+              <p key={region.slug} className="block">
+                {region.name}
+              </p>
+            ))}
           </div>
         </div>
 

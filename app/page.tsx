@@ -2,6 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Phone, ShieldCheck, Sparkles } from 'lucide-react';
 import ReservationCheckoutForm from '@/components/ReservationCheckoutForm';
+import Testimonials from '@/components/Testimonials';
+import CreativeContactForm from '@/components/CreativeContactForm';
 import {
   checkoutItems,
   companyPrinciples,
@@ -243,6 +245,8 @@ export default function Home() {
         </div>
       </section>
 
+      <Testimonials />
+
       <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="space-y-4">
@@ -341,53 +345,45 @@ export default function Home() {
       </section>
 
       <section id="booking" className="mx-auto max-w-7xl px-6 py-20 md:py-24">
-        <div className="panel grid gap-8 rounded-[2rem] p-8 md:grid-cols-[1.1fr_0.9fr] md:p-10">
-          <div className="space-y-5">
-            <p className="section-kicker">Start Your Project</p>
-            <h2 className="font-serif text-4xl text-white md:text-5xl">
-              Easy dumpster reservations and fast service quotes.
-            </h2>
-            <p className="max-w-2xl text-base leading-8 text-stone-300">
-              Submit your details through our secure form to reserve select services instantly, 
-              or reach out for a custom quote on washing and repair projects. We ensure a 
-              straightforward process from first contact to project completion.
-            </p>
+        <div className="flex flex-col gap-12 lg:flex-row">
+          <div className="flex-1 space-y-8">
+            <div className="space-y-5">
+              <p className="section-kicker">Secure Reservation</p>
+              <h2 className="font-serif text-4xl text-white md:text-5xl">
+                Reserve your 15-yard dumpster instantly.
+              </h2>
+              <p className="max-w-2xl text-base leading-8 text-stone-300">
+                Confirm the jobsite details here, then complete your payment securely via Stripe. 
+                Wakala follows up immediately after payment to finalize scheduling and placement.
+              </p>
+            </div>
+            
+            <div className="rounded-[2.5rem] border border-white/10 bg-black/45 p-8 md:p-10">
+              <h3 className="font-serif text-3xl text-white">Rental Payment</h3>
+              <p className="mt-3 text-sm leading-7 text-stone-400">
+                Flat $300 rate for a 3-day rental window. Includes delivery and pickup.
+              </p>
+              <ReservationCheckoutForm
+                itemId={paymentItem.id}
+                itemLabel={paymentItem.reservationLabel}
+                buttonLabel={paymentItem.buttonLabel}
+                className="mt-8"
+              />
+            </div>
           </div>
 
-          <div className="rounded-[1.75rem] border border-white/10 bg-black/45 p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Secure reservation</p>
-            <h3 className="mt-3 font-serif text-3xl text-white">15-yard dumpster reservation</h3>
-            <p className="mt-3 text-sm leading-7 text-stone-300">
-              Confirm the jobsite details here, then complete your payment securely. Wakala follows
-              up after payment to finalize scheduling and placement.
-            </p>
-            <ReservationCheckoutForm
-              itemId={paymentItem.id}
-              itemLabel={paymentItem.reservationLabel}
-              buttonLabel={paymentItem.buttonLabel}
-              className="mt-6"
-            />
-            <div className="mt-6 border-t border-white/10 pt-6">
-              <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Quote-based work</p>
-              <p className="mt-3 text-sm leading-7 text-stone-300">
-                Pressure washing, handyman jobs, yard cleanups, trailer rentals, and remodels are
-                best scheduled after a quick scope conversation.
+          <div className="flex-1 space-y-8">
+            <div className="space-y-5">
+              <p className="section-kicker">Custom Quote</p>
+              <h2 className="font-serif text-4xl text-white md:text-5xl">
+                Need a different service or a specific quote?
+              </h2>
+              <p className="max-w-2xl text-base leading-8 text-stone-300">
+                For pressure washing, yard cleanups, handyman repairs, or specialized hauling,
+                tell us about your project and we&apos;ll get back to you with pricing.
               </p>
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href={`tel:${site.phone}`}
-                  className="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white/50 hover:bg-white/5"
-                >
-                  {site.phoneDisplay}
-                </a>
-                <a
-                  href={`mailto:${site.email}`}
-                  className="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white/50 hover:bg-white/5"
-                >
-                  Email Wakala
-                </a>
-              </div>
             </div>
+            <CreativeContactForm />
           </div>
         </div>
       </section>
