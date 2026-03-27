@@ -101,7 +101,7 @@ export default function ReservationCheckoutForm({
         <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
         <p>
           Start the reservation by confirming contact and delivery details here, then complete the
-          card payment in Stripe Checkout.
+          secure payment process.
         </p>
       </div>
 

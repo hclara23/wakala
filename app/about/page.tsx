@@ -30,8 +30,7 @@ export default function AboutPage() {
           <p className="max-w-2xl text-lg leading-8 text-stone-300">
             Wakala is positioned for the kind of work homeowners, landlords, and contractors often
             need at the same time: hauling, cleanup, exterior washing, repair support, and light
-            remodel follow-through. The business model in this repo was already pointing in that
-            direction. This page now makes it explicit.
+            remodel follow-through. We bring these services together to simplify property management.
           </p>
         </div>
 
@@ -83,7 +82,7 @@ export default function AboutPage() {
           <div className="space-y-4">
             <p className="section-kicker">Service Snapshot</p>
             <h2 className="font-serif text-4xl text-white">
-              The service lineup is now reflected consistently across the site.
+              Professional support for every stage of property care.
             </h2>
           </div>
           <div className="grid gap-4">
@@ -105,20 +104,21 @@ export default function AboutPage() {
           <div className="space-y-4">
             <p className="section-kicker">Reserve A Dumpster</p>
             <h2 className="font-serif text-4xl text-white md:text-5xl">
-              Checkout is now scoped to the kind of purchase that should actually be paid online.
+              Secure, straightforward online reservations.
             </h2>
             <p className="max-w-2xl text-base leading-8 text-stone-300">
-              Rather than letting the browser send arbitrary service names and prices, the app now
-              uses a server-managed Stripe configuration with validated reservation details and a
-              cleaner success flow for the 15-yard dumpster offer.
+              Reserve your 15-yard dumpster with confidence. Our booking process is 
+              designed for speed and security, providing fixed rates and direct 
+              payment processing so you can focus on the job at hand.
             </p>
           </div>
 
           <div className="rounded-[1.75rem] border border-white/10 bg-black/40 p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Checkout-ready</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Reservation Details</p>
             <h3 className="mt-3 font-serif text-3xl text-white">15-yard dumpster reservation</h3>
             <p className="mt-3 text-sm leading-7 text-stone-300">
-              The reservation flow now starts with customer and delivery details before card payment.
+              Provide your delivery location and timing to lock in your 15-yard 
+              dumpster rental through our secure online process.
             </p>
             <Link
               href="/#booking"

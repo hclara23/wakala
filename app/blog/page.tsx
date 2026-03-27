@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'El Paso Property Services Blog | Wakala',
     description:
-      'Four SEO-focused service articles written for local searches around dumpsters, pressure washing, cleanups, and handyman work in El Paso.',
+      'Helpful articles on dumpster rentals, pressure washing, yard cleanups, and handyman work in El Paso.',
     url: `${site.url}/blog`,
     images: [
       {
@@ -101,15 +101,15 @@ export default function BlogIndexPage() {
         <div className="relative mx-auto max-w-7xl px-6 py-18 md:py-24">
           <div className="grid gap-10 xl:grid-cols-[1.05fr_0.95fr] xl:items-end">
             <Reveal className="space-y-7">
-              <p className="section-kicker">Field Notes & Local SEO</p>
-              <h1 className="max-w-5xl font-serif text-5xl text-white md:text-7xl">
-                Articles built to rank for the exact property-service searches Wakala wants.
-              </h1>
-              <p className="max-w-3xl text-lg leading-8 text-stone-300">
-                The repo already had article content in place. The site now presents it like a real
-                content hub: cinematic entry, clear search-intent signals, and stronger internal
-                paths back to the services page, gallery, and contact flow.
-              </p>
+            <p className="section-kicker">Field Notes & Property Tips</p>
+            <h1 className="max-w-5xl font-serif text-5xl text-white md:text-7xl">
+              Expert advice for maintaining and upgrading El Paso properties.
+            </h1>
+            <p className="max-w-3xl text-lg leading-8 text-stone-300">
+              From dumpster rental guides to pressure washing timing, our blog provides practical 
+              insights to help homeowners, landlords, and contractors keep their projects 
+              moving forward cleanly.
+            </p>
 
               <div className="flex flex-wrap gap-3">
                 {tagRail.map((tag, index) => (
@@ -126,24 +126,24 @@ export default function BlogIndexPage() {
 
             <Reveal delay={0.1}>
               <div className="panel rounded-[2rem] p-7 md:p-8">
-                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Content Snapshot</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Service Highlights</p>
                 <div className="mt-6 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-4">
                     <p className="text-3xl font-serif text-white">{blogPosts.length}</p>
-                    <p className="mt-2 text-xs uppercase tracking-[0.28em] text-stone-400">Written articles</p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.28em] text-stone-400">Expert articles</p>
                   </div>
                   <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-4">
                     <p className="text-3xl font-serif text-white">4</p>
-                    <p className="mt-2 text-xs uppercase tracking-[0.28em] text-stone-400">Core service topics</p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.28em] text-stone-400">Service categories</p>
                   </div>
                   <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-4">
                     <p className="text-3xl font-serif text-white">Local</p>
-                    <p className="mt-2 text-xs uppercase tracking-[0.28em] text-stone-400">El Paso search intent</p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.28em] text-stone-400">El Paso expertise</p>
                   </div>
                 </div>
                 <p className="mt-6 text-sm leading-7 text-stone-300">
-                  Each article is written around a practical search entry point, then routed back
-                  toward real service decisions instead of generic filler.
+                  Each article is written to provide practical advice for your next project, 
+                  helping you make informed decisions about your property maintenance.
                 </p>
               </div>
             </Reveal>
@@ -212,14 +212,14 @@ export default function BlogIndexPage() {
         <section className="mt-16">
           <Reveal className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="space-y-4">
-              <p className="section-kicker">Article Grid</p>
+              <p className="section-kicker">Wakala Blog</p>
               <h2 className="font-serif text-4xl text-white md:text-5xl">
-                Four finished articles, each tied to a different service lane.
+                Practical guides for your property projects.
               </h2>
             </div>
             <p className="max-w-2xl text-sm leading-7 text-stone-300 md:text-base">
-              The goal is not volume for its own sake. It is to give search traffic a relevant page
-              that moves naturally toward a quote, a reservation, or a clearer conversation.
+              We share our field experience to help you plan your next cleanup, 
+              renovation, or property reset with confidence.
             </p>
           </Reveal>
 
@@ -280,14 +280,13 @@ export default function BlogIndexPage() {
           <section className="panel rounded-[2rem] p-8 md:p-10">
             <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-center">
               <div className="space-y-4">
-                <p className="section-kicker">What To Do Next</p>
+                <p className="section-kicker">Contact Us</p>
                 <h2 className="font-serif text-4xl text-white md:text-5xl">
-                  Browse the gallery, then move into a real quote or reservation.
+                  Ready to start your next project?
                 </h2>
                 <p className="max-w-2xl text-base leading-8 text-stone-300">
-                  Content helps people understand the work. Trust usually comes from seeing the
-                  visual proof and then having a direct path to contact. The new blog is built to
-                  support both.
+                  Browse our gallery for inspiration, then reach out for a custom quote or 
+                  reserve a dumpster directly online to get your project moving.
                 </p>
               </div>
 
@@ -299,7 +298,7 @@ export default function BlogIndexPage() {
                   <p className="text-xs uppercase tracking-[0.3em] text-stone-400">See the work</p>
                   <h3 className="mt-3 font-serif text-3xl text-white">Visit the gallery</h3>
                   <p className="mt-3 text-sm leading-7 text-stone-300">
-                    Review cleanup, washing, haul-out, and repair imagery sourced from the local asset set.
+                    Review cleanup, washing, haul-out, and repair imagery from our recent local projects.
                   </p>
                 </Link>
                 <Link
@@ -309,7 +308,7 @@ export default function BlogIndexPage() {
                   <p className="text-xs uppercase tracking-[0.3em] text-stone-200">Ready to book</p>
                   <h3 className="mt-3 font-serif text-3xl text-white">Reserve a dumpster</h3>
                   <p className="mt-3 text-sm leading-7 text-stone-200/90">
-                    The fixed-price reservation flow is live on the home page and ready for secure checkout.
+                    Book your 15-yard dumpster instantly and securely through our online reservation flow.
                   </p>
                 </Link>
               </div>

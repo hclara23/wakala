@@ -73,12 +73,12 @@ export default function GalleryPage() {
             <Reveal className="space-y-7">
               <p className="section-kicker">Project Gallery</p>
               <h1 className="max-w-5xl font-serif text-5xl text-white md:text-7xl">
-                Real field images, organized like a proper visual proof-of-work page.
+                Real work from local properties across El Paso.
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-stone-300">
-                The gallery now leans on the local asset library in this repo instead of generic
-                placeholders. It is structured around the actual jobs Wakala sells most often, with
-                before-and-after context and service-level grouping built in.
+                Browse our growing collection of project imagery covering property resets, 
+                exterior washing, haul-outs, and repair support. See the professional 
+                results we deliver for homeowners and businesses every day.
               </p>
 
               <div className="mask-fade overflow-hidden">
@@ -97,11 +97,11 @@ export default function GalleryPage() {
 
             <Reveal delay={0.12}>
               <div className="panel rounded-[2rem] p-7 md:p-8">
-                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Gallery Stats</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Project Stats</p>
                 <div className="mt-6 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-4">
                     <p className="text-3xl font-serif text-white">{galleryImages.length}</p>
-                    <p className="mt-2 text-xs uppercase tracking-[0.28em] text-stone-400">Local asset images</p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.28em] text-stone-400">Project images</p>
                   </div>
                   <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-4">
                     <p className="text-3xl font-serif text-white">{serviceStoryCount}</p>
@@ -114,8 +114,8 @@ export default function GalleryPage() {
                 </div>
                 <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
                   <p className="text-sm leading-7 text-stone-300">
-                    This page is meant to answer a simple question quickly: does the company look
-                    like it does this type of work in the field? Now it does.
+                    We believe in letting the results speak for themselves. This gallery provides 
+                    a visual look at the care and attention we bring to every job site.
                   </p>
                 </div>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">

@@ -59,19 +59,19 @@ export default function Home() {
 
             <div className="grid gap-4 pt-6 sm:grid-cols-3">
               <div className="panel rounded-3xl p-5">
-                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Secure checkout</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Secure booking</p>
                 <p className="mt-3 text-sm leading-6 text-stone-300">
-                  Server-side Stripe pricing for dumpster reservations.
+                  Direct, fixed-price reservations protected by industry-standard encryption.
                 </p>
               </div>
               <div className="panel rounded-3xl p-5">
-                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Service mix</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Service range</p>
                 <p className="mt-3 text-sm leading-6 text-stone-300">
-                  Roll-offs, washing, hauling, handyman help, and small remodel support.
+                  Roll-offs, pressure washing, hauling, handyman repairs, and property refresunts.
                 </p>
               </div>
               <div className="panel rounded-3xl p-5">
-                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Coverage</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Local expertise</p>
                 <p className="mt-3 text-sm leading-6 text-stone-300">
                   Serving homeowners, landlords, and contractors across {site.areaServed}.
                 </p>
@@ -83,33 +83,32 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <ShieldCheck className="h-5 w-5 text-amber-300" />
               <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-200">
-                Booking Snapshot
+                Booking Information
               </p>
             </div>
             <div className="mt-6 space-y-5 text-sm leading-7 text-stone-300">
               <p>
-                The current site now separates direct payment from quote-based work. Dumpster
-                reservations use a server-managed Stripe configuration so pricing cannot be changed
-                from the browser.
+                Wakala offers both direct online booking and quote-based scheduling to fit your project. 
+                Our 15-yard dumpster rentals can be reserved instantly at a fixed price, ensuring 
+                standardized rates for your cleanup.
               </p>
               <p>
-                Pressure washing, handyman projects, yard cleanups, trailer rentals, and remodel
-                jobs stay quote-first, which matches how scope typically changes from property to
-                property.
+                For pressure washing, handyman repairs, and specialized cleanups, we provide custom 
+                estimates to match the specific scope and timing your property requires.
               </p>
             </div>
             <div className="mt-8 space-y-3">
               <div className="flex items-start gap-3 text-sm text-stone-200">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-amber-300" />
-                Reservations now collect customer and delivery details before checkout opens.
+                Reservations are secured before scheduling is finalized for your convenience.
               </div>
               <div className="flex items-start gap-3 text-sm text-stone-200">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-amber-300" />
-                Webhook verification is part of the Stripe flow, not just a redirect.
+                All payments are processed securely through Stripe for your peace of mind.
               </div>
               <div className="flex items-start gap-3 text-sm text-stone-200">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-amber-300" />
-                Placeholder media has been replaced with local business imagery and dedicated content pages.
+                View real examples of our recent property service work in the project gallery.
               </div>
             </div>
           </div>
@@ -119,15 +118,14 @@ export default function Home() {
       <section id="services" className="mx-auto max-w-7xl px-6 py-20 md:py-24">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl space-y-4">
-            <p className="section-kicker">What Wakala Handles</p>
+            <p className="section-kicker">Wakala Services</p>
             <h2 className="font-serif text-4xl text-white md:text-6xl">
-              Services built around how cleanup, hauling, and repair work overlap in real projects.
+              Professional property care, cleanup, and maintenance.
             </h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-stone-300 md:text-base">
-            The original app already presented the service mix well. The difference now is that it
-            runs on shared content instead of one-off hardcoded sections, which makes the new pages
-            consistent and easier to maintain.
+            From heavy-duty hauling to detailed repair work, we handle the tasks that keep 
+            residential and commercial properties in El Paso functional and looking their best.
           </p>
         </div>
 
@@ -205,9 +203,8 @@ export default function Home() {
               A practical local service company, not a one-service landing page pretending to do everything.
             </h2>
             <p className="max-w-xl text-base leading-8 text-stone-300">
-              Wakala already had the right service categories in the repo. The work here was to turn
-              that into a more credible business site with clearer structure, local context, and
-              pages customers can actually browse.
+              Wakala provides dependable property support, fast coordination, and visible 
+              before-and-after value for homeowners and businesses in El Paso.
             </p>
             <div className="grid gap-4 pt-2">
               {companyPrinciples.map((principle) => (
@@ -236,10 +233,10 @@ export default function Home() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-              <p className="text-xs uppercase tracking-[0.3em] text-amber-300/80">Field Notes</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-amber-300/80">Our Approach</p>
               <p className="mt-3 max-w-lg text-sm leading-7 text-stone-200">
-                The new content structure is built around how Wakala actually markets itself in the
-                existing repo: dependable property support, fast coordination, and visible before-and-after value.
+                We focus on professional execution and clear communication, ensuring every 
+                property is left ready for its next phase of use or renovation.
               </p>
             </div>
           </div>
@@ -249,9 +246,9 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="space-y-4">
-            <p className="section-kicker">Gallery Preview</p>
+            <p className="section-kicker">Project Gallery</p>
             <h2 className="font-serif text-4xl text-white md:text-5xl">
-              Real local image assets now power the gallery instead of placeholder stock.
+              Real work from local properties across El Paso.
             </h2>
           </div>
           <Link
@@ -294,10 +291,10 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 py-20 md:py-24">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="space-y-4">
-              <p className="section-kicker">SEO Blog</p>
+              <p className="section-kicker">Wakala Blog</p>
               <h2 className="max-w-4xl font-serif text-4xl text-white md:text-5xl">
-                Four premade blog posts built for local search around dumpsters, pressure washing,
-                yard cleanup, and handyman work in El Paso.
+                Practical advice for dumpster rentals, property maintenance, 
+                and repair work in the local El Paso area.
               </h2>
             </div>
             <Link
@@ -346,22 +343,22 @@ export default function Home() {
       <section id="booking" className="mx-auto max-w-7xl px-6 py-20 md:py-24">
         <div className="panel grid gap-8 rounded-[2rem] p-8 md:grid-cols-[1.1fr_0.9fr] md:p-10">
           <div className="space-y-5">
-            <p className="section-kicker">Reserve Or Quote</p>
+            <p className="section-kicker">Start Your Project</p>
             <h2 className="font-serif text-4xl text-white md:text-5xl">
-              Start with the reservation form, then finish payment in Stripe Checkout.
+              Easy dumpster reservations and fast service quotes.
             </h2>
             <p className="max-w-2xl text-base leading-8 text-stone-300">
-              This keeps the payment flow usable in production. Wakala gets the customer name,
-              contact info, service address, and notes before checkout opens, while fixed-price
-              reservations still complete securely through Stripe.
+              Submit your details through our secure form to reserve select services instantly, 
+              or reach out for a custom quote on washing and repair projects. We ensure a 
+              straightforward process from first contact to project completion.
             </p>
           </div>
 
           <div className="rounded-[1.75rem] border border-white/10 bg-black/45 p-6">
             <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Secure reservation</p>
-            <h3 className="mt-3 font-serif text-3xl text-white">15-yard dumpster deposit</h3>
+            <h3 className="mt-3 font-serif text-3xl text-white">15-yard dumpster reservation</h3>
             <p className="mt-3 text-sm leading-7 text-stone-300">
-              Confirm the jobsite details here, then complete card payment in Stripe. Wakala follows
+              Confirm the jobsite details here, then complete your payment securely. Wakala follows
               up after payment to finalize scheduling and placement.
             </p>
             <ReservationCheckoutForm

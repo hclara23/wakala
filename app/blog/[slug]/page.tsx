@@ -364,7 +364,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             <Reveal delay={0.12}>
               <aside className="panel rounded-[2rem] p-6">
-                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Keyword Signals</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Main Focus Areas</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {post.keywords.map((keyword) => (
                     <span
@@ -378,8 +378,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
                   <Sparkles className="h-4 w-4 text-amber-300" />
                   <p className="mt-3 text-sm leading-7 text-stone-300">
-                    These terms now map to actual published pages, structured data, and internal
-                    routing back to the booking and gallery experiences.
+                    Wakala handles each of these services with local crews, allowing you to 
+                    bundle cleanup, hauling, and maintenance into a single, coordinated project.
                   </p>
                 </div>
               </aside>

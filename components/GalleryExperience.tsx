@@ -40,14 +40,14 @@ export default function GalleryExperience({ images }: GalleryExperienceProps) {
     <div className="space-y-14">
       <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
         <div className="max-w-3xl space-y-4">
-          <p className="section-kicker">Service Lanes</p>
+          <p className="section-kicker">Project Gallery</p>
           <h2 className="font-serif text-4xl text-white md:text-5xl">
-            Filter the gallery by the kind of job you actually need handled.
+            Explore recent property work handled by the Wakala crew.
           </h2>
           <p className="text-base leading-8 text-stone-300">
-            These images are sourced from the project&apos;s local asset library and organized around
-            the service mix Wakala sells most often: washing, cleanup, haul-out, repairs, and
-            property reset work.
+            View real examples of our dumpster rentals, pressure washing, yard cleanups, and 
+            property repairs across El Paso. Each project reflects our focus on fast execution
+            and professional site care.
           </p>
         </div>
 
