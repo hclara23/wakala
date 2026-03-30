@@ -11,6 +11,9 @@ import unwantedAppliancesImage from '@/assets/unwanted appliances.jpg';
 import walkwayWashingImage from '@/assets/garden-brick-path-washing-2026-01-09-01-08-58-utc.jpg';
 import yardCleanupMaintenanceImage from '@/assets/garden-washing-maintenance-2026-01-08-23-59-30-utc.jpg';
 import yardCleanupWorkerImage from '@/assets/man-cleaning-the-yard-2026-01-07-01-55-21-utc.jpg';
+import evictionHorror1 from '@/assets/eviction-horror-1.jpg';
+import evictionHorror2 from '@/assets/eviction-horror-2.jpg';
+import evictionHorrorCrew from '@/assets/eviction-horror-crew.jpg';
 
 export type SiteImage = string | StaticImageData;
 
@@ -19,6 +22,7 @@ export const blogImageAssets = {
   pressureWashingGuide: drivewayWashingImage,
   yardCleanupGuide: yardCleanupWorkerImage,
   handymanGuide: drywallRemodelImage,
+  evictionHorror: evictionHorror1,
 } as const;
 
 export const galleryImageAssets = {
@@ -34,6 +38,9 @@ export const galleryImageAssets = {
   walkwayWashing: walkwayWashingImage,
   yardCleanupMaintenance: yardCleanupMaintenanceImage,
   yardCleanupWorker: yardCleanupWorkerImage,
+  evictionHorror1: evictionHorror1,
+  evictionHorror2: evictionHorror2,
+  evictionHorrorCrew: evictionHorrorCrew,
 } as const;
 
 export function getSiteImageSrc(image: SiteImage) {

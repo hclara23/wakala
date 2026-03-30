@@ -241,6 +241,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                         ))}
                       </ul>
                     ) : null}
+                    {section.image ? (
+                      <div className="relative mt-8 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/30">
+                        <Image
+                          src={section.image}
+                          alt={section.imageAlt || ''}
+                          width={800}
+                          height={500}
+                          className="w-full object-cover transition-transform duration-700 hover:scale-105"
+                        />
+                        {section.imageAlt && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                            <p className="text-xs italic text-stone-300">{section.imageAlt}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
                   </div>
                 </section>
               </Reveal>
