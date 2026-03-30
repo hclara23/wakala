@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Loader2, LockKeyhole } from 'lucide-react';
+import { trackEvent } from '@/lib/gtag';
 import type { CheckoutItemId } from '@/lib/site-data';
 import { cn } from '@/lib/utils';
 
@@ -81,6 +82,13 @@ export default function ReservationCheckoutForm({
       if (!payload.url) {
         throw new Error('Checkout URL was not returned.');
       }
+
+      trackEvent('begin_checkout', {
+        currency: 'USD',
+        item_id: itemId,
+        item_name: itemLabel,
+        value: 300,
+      });
 
       window.location.assign(payload.url);
     } catch (checkoutError: unknown) {

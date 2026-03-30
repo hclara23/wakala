@@ -12,6 +12,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { trackEvent } from '@/lib/gtag';
 import { services } from '@/lib/site-data';
 
 const projectTypes = [
@@ -52,6 +53,11 @@ export default function CreativeContactForm() {
       if (!response.ok) {
         throw new Error('Failed to send inquiry');
       }
+
+      trackEvent('generate_lead', {
+        form_name: 'project_builder',
+        project_type: selectedType || 'general',
+      });
 
       setIsSubmitted(true);
     } catch (err) {

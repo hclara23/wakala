@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
+import ThankYouAnalytics from '@/components/ThankYouAnalytics';
 import {
   formatReservationReference,
   getReservation,
@@ -45,6 +46,9 @@ async function getReservationSummary(sessionId?: string, reservationId?: string)
       serviceAddress: reservation.serviceAddress,
       preferredDate: reservation.preferredDate,
       amountTotal: formatCurrency(reservation.amountTotal, reservation.currency || 'usd'),
+      amountTotalCents: reservation.amountTotal,
+      currency: reservation.currency || 'usd',
+      itemName: reservation.itemName,
       scheduledDate: reservation.scheduledDate,
       scheduledWindow: reservation.scheduledWindow,
     };
@@ -77,6 +81,9 @@ async function getReservationSummary(sessionId?: string, reservationId?: string)
       serviceAddress: persistedReservation?.serviceAddress || metadata.serviceAddress || null,
       preferredDate: persistedReservation?.preferredDate || metadata.preferredDate || null,
       amountTotal: formatCurrency(session.amount_total, session.currency || 'usd'),
+      amountTotalCents: session.amount_total ?? persistedReservation?.amountTotal ?? null,
+      currency: session.currency || persistedReservation?.currency || 'usd',
+      itemName: persistedReservation?.itemName || '15-Yard Dumpster Rental (Full Payment)',
       paymentStatus: persistedReservation
         ? getReservationPaymentStatusLabel(persistedReservation.paymentStatus)
         : session.payment_status === 'paid'
@@ -101,6 +108,9 @@ async function getReservationSummary(sessionId?: string, reservationId?: string)
       serviceAddress: reservation.serviceAddress,
       preferredDate: reservation.preferredDate,
       amountTotal: formatCurrency(reservation.amountTotal, reservation.currency || 'usd'),
+      amountTotalCents: reservation.amountTotal,
+      currency: reservation.currency || 'usd',
+      itemName: reservation.itemName,
       scheduledDate: reservation.scheduledDate,
       scheduledWindow: reservation.scheduledWindow,
     };
@@ -114,6 +124,16 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
+      <ThankYouAnalytics
+        currency={(summary?.currency || 'usd').toUpperCase()}
+        isPaid={Boolean(isPaid)}
+        itemName={summary?.itemName || '15-Yard Dumpster Rental (Full Payment)'}
+        reservationId={summary?.reservationId || null}
+        transactionId={sessionId || summary?.reservationId || null}
+        value={
+          typeof summary?.amountTotalCents === 'number' ? summary.amountTotalCents / 100 : null
+        }
+      />
       <section className="panel rounded-[2rem] p-8 text-center md:p-12">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-amber-300/35 bg-amber-300/10">
           <CheckCircle2 className="h-8 w-8 text-amber-300" />

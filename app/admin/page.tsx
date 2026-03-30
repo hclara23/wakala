@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { loginAction } from '@/app/admin/actions';
-import { getAdminEmail, hasAdminSession, isAdminAuthConfigured } from '@/lib/admin-auth';
+import { hasAdminSession, isAdminAuthConfigured } from '@/lib/admin-auth';
 
 export const metadata: Metadata = {
   title: 'Admin Login',
@@ -71,7 +71,6 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
                 name="email"
                 type="email"
                 required
-                defaultValue={getAdminEmail()}
                 className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                 placeholder="Enter the dashboard email"
               />

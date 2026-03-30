@@ -1,5 +1,4 @@
 import { getStore } from '@netlify/blobs';
-import { get, list, put } from '@vercel/blob';
 import { randomBytes } from 'node:crypto';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -8,7 +7,6 @@ import { checkoutItems, type CheckoutItemId } from '@/lib/site-data';
 
 const LOCAL_RESERVATION_DIR = path.join(process.cwd(), '.data', 'reservations');
 const NETLIFY_STORE_NAME = 'reservations';
-const VERCEL_RESERVATION_PREFIX = 'reservations/';
 
 export const reservationStatuses = [
   'payment_pending',
@@ -94,27 +92,13 @@ const reservationPaymentStatusLabels: Record<ReservationPaymentStatus, string> =
   failed: 'Payment failed',
 };
 
-function usesVercelBlob() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-}
-
 function usesNetlifyBlobs() {
   return process.env.NETLIFY === 'true';
 }
 
 function getReservationStorageMode() {
-  if (usesVercelBlob()) {
-    return 'vercel' as const;
-  }
-
   if (usesNetlifyBlobs()) {
     return 'netlify' as const;
-  }
-
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      'Reservation storage is not configured. Set BLOB_READ_WRITE_TOKEN on Vercel before deploying.'
-    );
   }
 
   return 'local' as const;
@@ -160,10 +144,6 @@ function normalizeOptionalDate(value: string | null | undefined) {
 
 function buildReservationFilePath(id: string) {
   return path.join(LOCAL_RESERVATION_DIR, `${normalizeReservationId(id)}.json`);
-}
-
-function buildVercelReservationPath(id: string) {
-  return `${VERCEL_RESERVATION_PREFIX}${normalizeReservationId(id)}.json`;
 }
 
 async function ensureLocalReservationDir() {
@@ -229,19 +209,6 @@ async function readReservation(id: string) {
   const normalizedId = normalizeReservationId(id);
   const storageMode = getReservationStorageMode();
 
-  if (storageMode === 'vercel') {
-    const blob = await get(buildVercelReservationPath(normalizedId), {
-      access: 'private',
-      useCache: false,
-    });
-
-    if (!blob || blob.statusCode !== 200 || !blob.stream) {
-      return null;
-    }
-
-    return (await new Response(blob.stream).json()) as ReservationRecord;
-  }
-
   if (storageMode === 'netlify') {
     return (await getStore({
       name: NETLIFY_STORE_NAME,
@@ -254,16 +221,6 @@ async function readReservation(id: string) {
 
 async function writeReservation(reservation: ReservationRecord) {
   const storageMode = getReservationStorageMode();
-
-  if (storageMode === 'vercel') {
-    await put(buildVercelReservationPath(reservation.id), JSON.stringify(reservation, null, 2), {
-      access: 'private',
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      contentType: 'application/json',
-    });
-    return;
-  }
 
   if (storageMode === 'netlify') {
     await getStore({
@@ -278,41 +235,6 @@ async function writeReservation(reservation: ReservationRecord) {
 
 async function listStoredReservations() {
   const storageMode = getReservationStorageMode();
-
-  if (storageMode === 'vercel') {
-    const reservations: ReservationRecord[] = [];
-    let cursor: string | undefined;
-
-    do {
-      const response = await list({
-        cursor,
-        limit: 1000,
-        prefix: VERCEL_RESERVATION_PREFIX,
-      });
-
-      const pageReservations = await Promise.all(
-        response.blobs.map(async ({ pathname }) => {
-          const blob = await get(pathname, {
-            access: 'private',
-            useCache: false,
-          });
-
-          if (!blob || blob.statusCode !== 200 || !blob.stream) {
-            return null;
-          }
-
-          return (await new Response(blob.stream).json()) as ReservationRecord;
-        })
-      );
-
-      reservations.push(
-        ...pageReservations.filter((reservation): reservation is ReservationRecord => reservation !== null)
-      );
-      cursor = response.hasMore ? response.cursor : undefined;
-    } while (cursor);
-
-    return reservations;
-  }
 
   if (storageMode === 'netlify') {
     const store = getStore({

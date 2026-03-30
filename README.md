@@ -21,7 +21,10 @@ View your app in AI Studio: https://ai.studio/apps/037e4d61-0f20-4130-aec5-e2fd6
    - `STRIPE_SECRET_KEY`
    - `STRIPE_PRICE_DUMPSTER_15_RESERVATION`
    - `STRIPE_WEBHOOK_SECRET`
-   - `BLOB_READ_WRITE_TOKEN` for Vercel
+   - `NEXT_PUBLIC_GA_ID`
+   - `GA4_PROPERTY_ID`
+   - `GA_SERVICE_ACCOUNT_EMAIL`
+   - `GA_SERVICE_ACCOUNT_PRIVATE_KEY`
    - `ADMIN_RESERVATIONS_EMAIL`
    - `ADMIN_RESERVATIONS_PASSWORD`
 3. Run the app:
@@ -37,7 +40,12 @@ View your app in AI Studio: https://ai.studio/apps/037e4d61-0f20-4130-aec5-e2fd6
 
 ## Reservation Dashboard
 
-- On Vercel, reservations are stored durably using `BLOB_READ_WRITE_TOKEN`.
-- Netlify Blobs is still supported if the app is deployed there instead.
+- On Netlify, reservations are stored durably using Netlify Blobs.
 - Local development falls back to `.data/reservations/`, which is ignored by Git.
 - Visit `/admin` and sign in with `ADMIN_RESERVATIONS_EMAIL` and `ADMIN_RESERVATIONS_PASSWORD` to review, confirm, or annotate reservation requests.
+
+## Google Analytics Dashboard
+
+- The site already supports the GA4 browser tag through `NEXT_PUBLIC_GA_ID`.
+- The admin dashboard can also read GA4 reporting data, but that requires `GA4_PROPERTY_ID` plus a Google service account with Analytics read access.
+- The dashboard pulls traffic, top pages, top channels, and lead events from Google Analytics.

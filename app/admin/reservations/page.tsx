@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { logoutAction, updateReservationAction } from '@/app/admin/actions';
 import { requireAdminSession } from '@/lib/admin-auth';
+import { getGoogleAnalyticsDashboard } from '@/lib/google-analytics';
 import {
   filterReservations,
   formatReservationReference,
@@ -52,6 +53,20 @@ function formatCurrency(amountInCents: number) {
     style: 'currency',
     currency: 'USD',
   }).format(amountInCents / 100);
+}
+
+function formatWholeNumber(value: number) {
+  return new Intl.NumberFormat('en-US').format(value);
+}
+
+function formatPercent(value: number) {
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+function formatDuration(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const remainder = Math.round(seconds % 60);
+  return `${minutes}m ${remainder}s`;
 }
 
 function getStatusClasses(status: ReservationStatus) {
@@ -280,7 +295,10 @@ export default async function AdminReservationsPage({
 }: AdminReservationsPageProps) {
   await requireAdminSession();
 
-  const allReservations = await listReservations();
+  const [allReservations, analytics] = await Promise.all([
+    listReservations(),
+    getGoogleAnalyticsDashboard(),
+  ]);
   const { error, paymentStatus: rawPaymentStatus, query = '', status: rawStatus } =
     await searchParams;
   const status = normalizeStatusFilter(rawStatus);
@@ -381,6 +399,132 @@ export default async function AdminReservationsPage({
           <p className="mt-3 font-serif text-4xl text-white">{stats.attention}</p>
         </div>
       </div>
+
+      <section className="panel mt-8 rounded-[2rem] p-6 md:p-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="section-kicker">Analytics</p>
+            <h2 className="mt-3 font-serif text-3xl text-white">Google Analytics snapshot</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-300">
+              Website traffic, top landing pages, and lead activity pulled into the same dashboard
+              as reservation operations.
+            </p>
+          </div>
+
+          <div className="rounded-[1.25rem] border border-white/10 bg-black/30 px-4 py-3 text-sm text-stone-300">
+            Tracking ID: {analytics.trackingId || 'Not configured'}
+          </div>
+        </div>
+
+        {analytics.message ? (
+          <p className="mt-6 rounded-2xl border border-amber-300/25 bg-amber-300/8 px-4 py-3 text-sm leading-7 text-stone-200">
+            {analytics.message}
+          </p>
+        ) : null}
+
+        {analytics.summary ? (
+          <>
+            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Users / 30 Days</p>
+                <p className="mt-3 font-serif text-4xl text-white">
+                  {formatWholeNumber(analytics.summary.totalUsers)}
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Sessions / 30 Days</p>
+                <p className="mt-3 font-serif text-4xl text-white">
+                  {formatWholeNumber(analytics.summary.sessions)}
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Page Views / 30 Days</p>
+                <p className="mt-3 font-serif text-4xl text-white">
+                  {formatWholeNumber(analytics.summary.pageViews)}
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-emerald-400/20 bg-emerald-400/8 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Realtime Active Users</p>
+                <p className="mt-3 font-serif text-4xl text-white">
+                  {formatWholeNumber(analytics.realtimeActiveUsers || 0)}
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-sky-400/20 bg-sky-400/8 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Engagement Rate</p>
+                <p className="mt-3 font-serif text-4xl text-white">
+                  {formatPercent(analytics.summary.engagementRate)}
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-amber-300/20 bg-amber-300/8 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Avg. Session Duration</p>
+                <p className="mt-3 font-serif text-4xl text-white">
+                  {formatDuration(analytics.summary.averageSessionDuration)}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-6 xl:grid-cols-3">
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 xl:col-span-1">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Lead Events</p>
+                <div className="mt-4 space-y-3">
+                  {analytics.conversions.length > 0 ? (
+                    analytics.conversions.map((conversion) => (
+                      <div
+                        key={conversion.eventName}
+                        className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3"
+                      >
+                        <span className="text-sm text-stone-200">{conversion.eventName}</span>
+                        <span className="text-sm font-semibold text-white">
+                          {formatWholeNumber(conversion.count)}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm leading-7 text-stone-400">
+                      Lead and checkout events will appear here after traffic starts hitting the new
+                      event tracking.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 xl:col-span-1">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Top Pages</p>
+                <div className="mt-4 space-y-3">
+                  {analytics.topPages.map((page) => (
+                    <div
+                      key={page.pagePath}
+                      className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3"
+                    >
+                      <p className="truncate text-sm text-white">{page.pagePath || '/'}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-stone-500">
+                        {formatWholeNumber(page.pageViews)} views • {formatWholeNumber(page.sessions)} sessions
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 xl:col-span-1">
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Traffic Channels</p>
+                <div className="mt-4 space-y-3">
+                  {analytics.topChannels.map((channel) => (
+                    <div
+                      key={channel.channel}
+                      className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3"
+                    >
+                      <p className="text-sm text-white">{channel.channel}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-stone-500">
+                        {formatWholeNumber(channel.sessions)} sessions • {formatWholeNumber(channel.users)} users
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
+      </section>
 
       <form method="get" className="panel mt-8 grid gap-4 rounded-[2rem] p-6 md:grid-cols-[1.2fr_0.8fr_0.8fr_auto_auto]">
         <div className="space-y-2">
