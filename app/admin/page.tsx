@@ -25,7 +25,7 @@ function getErrorMessage(error?: string) {
     case 'invalid-credentials':
       return 'The admin email or password was incorrect.';
     case 'missing-config':
-      return 'Add ADMIN_RESERVATIONS_EMAIL and ADMIN_RESERVATIONS_PASSWORD to your environment before using the dashboard.';
+      return 'ADMIN_RESERVATIONS_EMAIL and ADMIN_RESERVATIONS_PASSWORD must be available to the site before using the dashboard. In Netlify, confirm they are set in site environment settings and trigger a fresh deploy.';
     default:
       return null;
   }
@@ -54,8 +54,10 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
 
         {!configured ? (
           <div className="mt-8 rounded-[1.5rem] border border-amber-300/25 bg-amber-300/8 p-5 text-sm leading-7 text-stone-200">
-            Add <code>ADMIN_RESERVATIONS_EMAIL</code> and <code>ADMIN_RESERVATIONS_PASSWORD</code>{' '}
-            to <code>.env.local</code> before using this page.
+            This dashboard needs <code>ADMIN_RESERVATIONS_EMAIL</code> and{' '}
+            <code>ADMIN_RESERVATIONS_PASSWORD</code> in the site environment before it can load
+            the login form. If those values are already set in Netlify, run a fresh deploy so this
+            page picks them up.
           </div>
         ) : (
           <form action={loginAction} className="mt-8 space-y-5">
