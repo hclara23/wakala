@@ -1,28 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  Trash2, 
-  Droplet, 
-  Wrench, 
-  Wind, 
-  Hammer, 
-  Truck, 
+import {
+  Trash2,
+  Droplet,
+  Wrench,
+  Wind,
+  Hammer,
+  Truck,
   Send,
-  CheckCircle2
+  CheckCircle2,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { getClientLeadAttribution } from '@/lib/lead-attribution';
+import { getProjectTypeLabel, projectTypeOptions } from '@/lib/project-types';
 import { trackEvent } from '@/lib/gtag';
-import { services } from '@/lib/site-data';
 
-const projectTypes = [
-  { id: 'dumpster', label: 'Dumpster', icon: Trash2 },
-  { id: 'washing', label: 'Washing', icon: Droplet },
-  { id: 'repairs', label: 'Repairs', icon: Wrench },
-  { id: 'cleanup', label: 'Cleanup', icon: Wind },
-  { id: 'remodel', label: 'Remodel', icon: Hammer },
-  { id: 'hauling', label: 'Hauling', icon: Truck },
-];
+const projectTypeIcons = {
+  dumpster: Trash2,
+  washing: Droplet,
+  repairs: Wrench,
+  cleanup: Wind,
+  remodel: Hammer,
+  hauling: Truck,
+} as const;
 
 export default function CreativeContactForm() {
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -39,8 +40,10 @@ export default function CreativeContactForm() {
     const data = {
       name: formData.get('name'),
       email: formData.get('email'),
+      phone: formData.get('phone'),
       details: formData.get('details'),
       projectType: selectedType,
+      attribution: getClientLeadAttribution(),
     };
 
     try {
@@ -70,7 +73,7 @@ export default function CreativeContactForm() {
 
   if (isSubmitted) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center rounded-[2.5rem] bg-amber-300 py-16 px-8 text-center"
@@ -81,7 +84,7 @@ export default function CreativeContactForm() {
         <h3 className="mt-6 font-serif text-3xl text-black">Message Sent!</h3>
         <p className="mt-4 max-w-xs text-sm font-medium leading-6 text-black/70">
           Wakala received your project details. We&apos;ll reach out shortly to discuss the scope and 
-          pricing for your {selectedType} project.
+          pricing for your {selectedType ? getProjectTypeLabel(selectedType).toLowerCase() : 'project'} project.
         </p>
         <button 
           onClick={() => { setIsSubmitted(false); setSelectedType(null); }}
@@ -105,8 +108,8 @@ export default function CreativeContactForm() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-          {projectTypes.map((type) => {
-            const Icon = type.icon;
+          {projectTypeOptions.map((type) => {
+            const Icon = projectTypeIcons[type.id];
             const isSelected = selectedType === type.id;
             return (
               <button
@@ -114,8 +117,8 @@ export default function CreativeContactForm() {
                 type="button"
                 onClick={() => setSelectedType(type.id)}
                 className={`flex flex-col items-center gap-3 rounded-2xl border p-4 transition-all duration-300 ${
-                  isSelected 
-                    ? 'border-amber-300 bg-amber-300 text-black' 
+                  isSelected
+                    ? 'border-amber-300 bg-amber-300 text-black'
                     : 'border-white/10 bg-white/[0.03] text-stone-400 hover:border-white/30 hover:bg-white/[0.06]'
                 }`}
               >
@@ -157,6 +160,18 @@ export default function CreativeContactForm() {
                   name="email"
                   type="email"
                   placeholder="john@example.com"
+                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm text-white placeholder:text-stone-700 focus:border-amber-300/50 focus:outline-none focus:ring-1 focus:ring-amber-300/50 transition-colors"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[0.65rem] font-bold uppercase tracking-widest text-stone-500 ml-2">
+                  Phone Number
+                </label>
+                <input
+                  required
+                  name="phone"
+                  type="tel"
+                  placeholder="(915) 555-1234"
                   className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm text-white placeholder:text-stone-700 focus:border-amber-300/50 focus:outline-none focus:ring-1 focus:ring-amber-300/50 transition-colors"
                 />
               </div>

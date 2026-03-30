@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Loader2, LockKeyhole } from 'lucide-react';
+import { getClientLeadAttribution } from '@/lib/lead-attribution';
 import { trackEvent } from '@/lib/gtag';
 import type { CheckoutItemId } from '@/lib/site-data';
 import { cn } from '@/lib/utils';
@@ -69,6 +70,7 @@ export default function ReservationCheckoutForm({
         },
         body: JSON.stringify({
           itemId,
+          attribution: getClientLeadAttribution(),
           ...formState,
         }),
       });

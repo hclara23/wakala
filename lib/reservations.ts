@@ -3,6 +3,8 @@ import { randomBytes } from 'node:crypto';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type Stripe from 'stripe';
+import type { LeadAttributionInput } from '@/lib/lead-attribution';
+import { upsertLeadFromReservation } from '@/lib/leads';
 import { checkoutItems, type CheckoutItemId } from '@/lib/site-data';
 
 const LOCAL_RESERVATION_DIR = path.join(process.cwd(), '.data', 'reservations');
@@ -58,6 +60,7 @@ export type ReservationRecord = {
 };
 
 type CreateReservationInput = {
+  attribution?: LeadAttributionInput | null;
   itemId: CheckoutItemId;
   customerName: string;
   email: string;
@@ -77,6 +80,27 @@ type AdminReservationUpdate = {
   scheduledWindow: string;
   adminNotes: string;
 };
+
+function buildLeadSyncPayload(
+  reservation: ReservationRecord,
+  attribution?: LeadAttributionInput | null
+) {
+  return {
+    attribution,
+    amountTotal: reservation.amountTotal,
+    customerName: reservation.customerName,
+    details: reservation.notes,
+    email: reservation.email,
+    itemName: reservation.itemName,
+    paymentStatus: reservation.paymentStatus,
+    phone: reservation.phone,
+    preferredDate: reservation.preferredDate,
+    reservationId: reservation.id,
+    reservationStatus: reservation.status,
+    scheduledDate: reservation.scheduledDate,
+    serviceAddress: reservation.serviceAddress,
+  };
+}
 
 const reservationStatusLabels: Record<ReservationStatus, string> = {
   payment_pending: 'Awaiting payment',
@@ -414,6 +438,7 @@ export async function createReservationDraft(input: CreateReservationInput) {
   };
 
   await writeReservation(reservation);
+  await upsertLeadFromReservation(buildLeadSyncPayload(reservation, input.attribution));
 
   return reservation;
 }
@@ -428,7 +453,7 @@ export async function attachCheckoutSessionToReservation(
     throw new Error('Reservation not found.');
   }
 
-  await writeReservation({
+  const nextReservation: ReservationRecord = {
     ...reservation,
     checkoutSessionId: session.id,
     amountTotal: session.amount_total ?? reservation.amountTotal,
@@ -438,7 +463,10 @@ export async function attachCheckoutSessionToReservation(
         ? session.customer
         : session.customer?.id || reservation.stripeCustomerId,
     updatedAt: nowIso(),
-  });
+  };
+
+  await writeReservation(nextReservation);
+  await upsertLeadFromReservation(buildLeadSyncPayload(nextReservation));
 }
 
 export async function getReservation(reservationId: string) {
@@ -497,6 +525,7 @@ export async function syncReservationFromCheckoutSession(
   };
 
   await writeReservation(reservation);
+  await upsertLeadFromReservation(buildLeadSyncPayload(reservation));
 
   return reservation;
 }
@@ -532,6 +561,7 @@ export async function updateReservationByAdmin(
   };
 
   await writeReservation(nextReservation);
+  await upsertLeadFromReservation(buildLeadSyncPayload(nextReservation));
 
   return nextReservation;
 }

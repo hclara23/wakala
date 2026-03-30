@@ -15,6 +15,7 @@ import {
   updateReservationByAdmin,
   type ReservationStatus,
 } from '@/lib/reservations';
+import { leadPipelineStatuses, updateLeadByAdmin, type LeadPipelineStatus } from '@/lib/leads';
 
 export async function loginAction(formData: FormData) {
   if (!isAdminAuthConfigured()) {
@@ -29,7 +30,7 @@ export async function loginAction(formData: FormData) {
   }
 
   await setAdminSession();
-  redirect('/admin/reservations');
+  redirect('/admin/leads');
 }
 
 export async function logoutAction() {
@@ -64,4 +65,29 @@ export async function updateReservationAction(formData: FormData) {
   }
 
   revalidatePath('/admin/reservations');
+  revalidatePath('/admin/leads');
+}
+
+export async function updateLeadAction(formData: FormData) {
+  await requireAdminSession();
+
+  const leadId = String(formData.get('leadId') || '').trim();
+  const pipelineStatus = String(formData.get('pipelineStatus') || '').trim() as LeadPipelineStatus;
+  const adminNotes = String(formData.get('adminNotes') || '').trim();
+
+  if (!leadPipelineStatuses.includes(pipelineStatus)) {
+    redirect('/admin/leads?error=invalid-status');
+  }
+
+  try {
+    await updateLeadByAdmin(leadId, {
+      adminNotes,
+      pipelineStatus,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'The lead could not be updated.';
+    redirect(`/admin/leads?error=${encodeURIComponent(message)}`);
+  }
+
+  revalidatePath('/admin/leads');
 }

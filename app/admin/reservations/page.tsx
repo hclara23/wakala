@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import AdminNavigation from '@/components/admin/AdminNavigation';
 import { logoutAction, updateReservationAction } from '@/app/admin/actions';
 import { requireAdminSession } from '@/lib/admin-auth';
 import { getGoogleAnalyticsDashboard } from '@/lib/google-analytics';
@@ -17,7 +18,7 @@ import {
 } from '@/lib/reservations';
 
 export const metadata: Metadata = {
-  title: 'Reservations',
+  title: 'Reservation Operations',
   robots: {
     index: false,
     follow: false,
@@ -341,15 +342,16 @@ export default async function AdminReservationsPage({
         <div>
           <p className="section-kicker">Admin</p>
           <h1 className="mt-4 font-serif text-5xl text-white md:text-6xl">
-            Reservation dashboard
+            Reservation operations
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-8 text-stone-300">
             Confirm paid reservations, assign delivery windows, track revenue, and keep the daily
-            dispatch workflow in one place.
+            dispatch workflow aligned with the lead pipeline.
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <AdminNavigation current="reservations" />
           <Link
             href="/"
             className="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white/50 hover:bg-white/5"

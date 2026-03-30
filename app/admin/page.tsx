@@ -33,7 +33,7 @@ function getErrorMessage(error?: string) {
 
 export default async function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
   if (await hasAdminSession()) {
-    redirect('/admin/reservations');
+    redirect('/admin/leads');
   }
 
   const configured = isAdminAuthConfigured();
@@ -45,11 +45,11 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
       <section className="panel rounded-[2rem] p-8 md:p-12">
         <p className="section-kicker">Admin</p>
         <h1 className="mt-4 font-serif text-5xl text-white md:text-6xl">
-          Reservation dashboard login
+          Business dashboard login
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-8 text-stone-300">
-          Review paid reservations, confirm delivery windows, and keep internal scheduling notes in
-          one place.
+          Review inbound leads, update the sales pipeline, confirm paid reservations, and keep
+          daily dispatch notes in one place.
         </p>
 
         {!configured ? (

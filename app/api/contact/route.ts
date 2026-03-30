@@ -1,45 +1,97 @@
 import { NextResponse } from 'next/server';
+import type { LeadAttributionInput } from '@/lib/lead-attribution';
+import { createContactLead } from '@/lib/leads';
+import { getProjectTypeLabel, isProjectTypeId } from '@/lib/project-types';
 import { site } from '@/lib/site-data';
+
+export const runtime = 'nodejs';
+
+type ContactRequestBody = {
+  attribution?: LeadAttributionInput;
+  details?: unknown;
+  email?: unknown;
+  name?: unknown;
+  phone?: unknown;
+  projectType?: unknown;
+};
+
+function getTextField(
+  value: unknown,
+  fieldName: string,
+  { required = true, maxLength = 120 }: { required?: boolean; maxLength?: number } = {}
+) {
+  if (typeof value !== 'string') {
+    if (required) {
+      throw new Error(`${fieldName} is required.`);
+    }
+
+    return '';
+  }
+
+  const trimmed = value.trim();
+
+  if (required && !trimmed) {
+    throw new Error(`${fieldName} is required.`);
+  }
+
+  if (trimmed.length > maxLength) {
+    throw new Error(`${fieldName} is too long.`);
+  }
+
+  return trimmed;
+}
+
+function validateEmail(value: unknown) {
+  const email = getTextField(value, 'Email address', { maxLength: 120 });
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailPattern.test(email)) {
+    throw new Error('Enter a valid email address.');
+  }
+
+  return email.toLowerCase();
+}
+
+function validatePhone(value: unknown) {
+  const phone = getTextField(value, 'Phone number', { maxLength: 24 });
+  const digits = phone.replace(/\D/g, '');
+
+  if (digits.length < 10) {
+    throw new Error('Enter a valid phone number.');
+  }
+
+  return phone;
+}
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, details, projectType } = body;
+    const body = (await request.json()) as ContactRequestBody;
+    const name = getTextField(body.name, 'Full name', { maxLength: 80 });
+    const email = validateEmail(body.email);
+    const phone = validatePhone(body.phone);
+    const details = getTextField(body.details, 'Project details', { maxLength: 2400 });
 
-    // Basic validation
-    if (!name || !email || !details || !projectType) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    if (typeof body.projectType !== 'string' || !isProjectTypeId(body.projectType)) {
+      return NextResponse.json({ error: 'Select a valid project type.' }, { status: 400 });
     }
 
-    // LOGGING FOR VERIFICATION
-    // In a production environment, this is where you would integrate with Resend, SendGrid, or Postmark.
+    const projectLabel = getProjectTypeLabel(body.projectType);
+
+    await createContactLead({
+      attribution: body.attribution,
+      customerName: name,
+      details,
+      email,
+      phone,
+      serviceType: projectLabel,
+    });
+
     console.log('--- NEW CONTACT INQUIRY ---');
-    console.log(`To: ${site.email}`); // wakalaep915@gmail.com
-    console.log(`From: ${name} (${email})`);
-    console.log(`Service: ${projectType}`);
+    console.log(`To: ${site.email}`);
+    console.log(`From: ${name} (${email}, ${phone})`);
+    console.log(`Service: ${projectLabel}`);
     console.log(`Message: ${details}`);
     console.log('---------------------------');
-
-    /**
-     * EXAMPLE RESEND INTEGRATION (Instruction for User):
-     * 
-     * 1. npm install resend
-     * 2. Add RESEND_API_KEY to your .env.local
-     * 3. Update this route:
-     * 
-     * import { Resend } from 'resend';
-     * const resend = new Resend(process.env.RESEND_API_KEY);
-     * 
-     * await resend.emails.send({
-     *   from: 'Wakala Website <onboarding@resend.dev>',
-     *   to: site.email,
-     *   subject: `New ${projectType} Inquiry from ${name}`,
-     *   text: `Details: ${details}\n\nClient Email: ${email}`,
-     * });
-     */
 
     // Simulate a network delay
     await new Promise((resolve) => setTimeout(resolve, 800));

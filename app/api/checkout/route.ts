@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { LeadAttributionInput } from '@/lib/lead-attribution';
 import { attachCheckoutSessionToReservation, createReservationDraft } from '@/lib/reservations';
 import { checkoutItems, type CheckoutItemId } from '@/lib/site-data';
 import { getCheckoutItem, getCheckoutPriceReference, getStripe, resolveBaseUrl } from '@/lib/stripe';
@@ -6,6 +7,7 @@ import { getCheckoutItem, getCheckoutPriceReference, getStripe, resolveBaseUrl }
 export const runtime = 'nodejs';
 
 type CheckoutRequestBody = {
+  attribution?: LeadAttributionInput;
   itemId?: CheckoutItemId;
   customerName?: unknown;
   email?: unknown;
@@ -144,6 +146,7 @@ export async function POST(req: Request) {
     const appUrl = resolveBaseUrl(req);
     const metadata = buildMetadata(body);
     const reservation = await createReservationDraft({
+      attribution: body.attribution,
       itemId,
       ...metadata,
     });
