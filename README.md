@@ -1,22 +1,20 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Wakala Property Services
 
-# Run and deploy your AI Studio app
+Marketing site and admin dashboard for Wakala's dumpster reservations, quote intake, and daily job management.
 
-This contains everything you need to run your app locally.
+## Stack
 
-View your app in AI Studio: https://ai.studio/apps/037e4d61-0f20-4130-aec5-e2fd6f83966b
+- Next.js 15 App Router
+- Netlify hosting and Netlify Blobs for production storage
+- Stripe Checkout for online dumpster payments
+- Google Analytics 4 for traffic and funnel reporting
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+## Local Development
 
 1. Install dependencies:
    `npm install`
-2. Set the required values in [.env.local](.env.local):
-   - `GEMINI_API_KEY`
+2. Copy `.env.example` to `.env.local`
+3. Set the required values:
    - `APP_URL`
    - `STRIPE_SECRET_KEY`
    - `STRIPE_PRICE_DUMPSTER_15_RESERVATION`
@@ -27,25 +25,95 @@ View your app in AI Studio: https://ai.studio/apps/037e4d61-0f20-4130-aec5-e2fd6
    - `GA_SERVICE_ACCOUNT_PRIVATE_KEY`
    - `ADMIN_RESERVATIONS_EMAIL`
    - `ADMIN_RESERVATIONS_PASSWORD`
-3. Run the app:
+4. Start the dev server:
    `npm run dev`
 
-## Stripe Notes
+## Core Commands
 
-- The live reservation flow expects `STRIPE_PRICE_DUMPSTER_15_RESERVATION` and `STRIPE_WEBHOOK_SECRET`.
-- For local webhook testing with Stripe CLI, forward events to:
-  `stripe listen --forward-to localhost:3000/api/stripe/webhook`
-- Subscribe the deployed webhook endpoint to:
-  `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `checkout.session.async_payment_failed`.
+- `npm run dev` starts local development
+- `npm run build` creates the production build
+- `npm run start` runs the production build locally
+- `npm run lint` runs ESLint
 
-## Reservation Dashboard
+## Admin Dashboard
 
-- On Netlify, reservations are stored durably using Netlify Blobs.
-- Local development falls back to `.data/reservations/`, which is ignored by Git.
-- Visit `/admin` and sign in with `ADMIN_RESERVATIONS_EMAIL` and `ADMIN_RESERVATIONS_PASSWORD` to review, confirm, or annotate reservation requests.
+The admin login lives at `/admin`.
 
-## Google Analytics Dashboard
+After login there are two working areas:
 
-- The site already supports the GA4 browser tag through `NEXT_PUBLIC_GA_ID`.
-- The admin dashboard can also read GA4 reporting data, but that requires `GA4_PROPERTY_ID` plus a Google service account with Analytics read access.
-- The dashboard pulls traffic, top pages, top channels, and lead events from Google Analytics.
+- `/admin/leads`
+  Tracks quote requests and reservation starts in one pipeline. Includes source attribution, UTM data, follow-up notes, CSV export, and 30-day funnel reporting.
+- `/admin/reservations`
+  Handles paid reservation operations including payment state, scheduling windows, dispatch notes, and Google Analytics traffic reporting.
+
+The built-in dashboard auth uses:
+
+- `ADMIN_RESERVATIONS_EMAIL`
+- `ADMIN_RESERVATIONS_PASSWORD`
+
+For local development these live in `.env.local`. In production, set them in Netlify site environment variables.
+
+## Lead And Reservation Storage
+
+- Production uses Netlify Blobs.
+- Local development falls back to:
+  - `.data/leads/`
+  - `.data/reservations/`
+
+Both directories are ignored by Git.
+
+## Reservation Flow
+
+1. A customer submits the dumpster checkout form.
+2. The app creates a reservation draft and a linked lead record.
+3. Stripe Checkout collects payment.
+4. Stripe webhook events sync payment status back into the reservation and lead records.
+5. Wakala confirms the delivery window from the reservation dashboard.
+
+## Quote And Lead Flow
+
+1. A visitor submits the project builder form.
+2. The app stores a lead with service type, contact info, notes, page attribution, referrer, and UTM values.
+3. The lead appears in `/admin/leads` for follow-up and pipeline updates.
+
+## Google Analytics
+
+The public site tag uses `NEXT_PUBLIC_GA_ID`.
+
+The admin dashboard can also read GA4 reporting data. That requires:
+
+- `GA4_PROPERTY_ID`
+- `GA_SERVICE_ACCOUNT_EMAIL`
+- `GA_SERVICE_ACCOUNT_PRIVATE_KEY`
+
+The service account must have read access to the GA4 property and the Analytics Data API must be enabled.
+
+Current admin reporting includes:
+
+- sessions, users, and page views
+- top landing pages
+- top traffic channels
+- tracked events for `generate_lead`, `begin_checkout`, and `purchase`
+- a 30-day acquisition funnel inside the lead inbox
+
+## Stripe Webhooks
+
+The deployed webhook endpoint is:
+
+- `/api/stripe/webhook`
+
+Subscribe Stripe to:
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.async_payment_failed`
+
+For local webhook testing with Stripe CLI:
+
+`stripe listen --forward-to localhost:3000/api/stripe/webhook`
+
+## Netlify Deployment Notes
+
+- The project is intended to deploy from GitHub to Netlify.
+- Make sure the environment variables above are set in Netlify before deploying.
+- If admin or analytics settings change in Netlify, trigger a fresh deploy so server-rendered pages pick up the new values.

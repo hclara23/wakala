@@ -13,6 +13,7 @@ type ReportResponse = {
 };
 
 export type GoogleAnalyticsDashboard = {
+  dateRangeDays: number;
   trackingId: string | null;
   trackingEnabled: boolean;
   reportingEnabled: boolean;
@@ -36,6 +37,7 @@ export type GoogleAnalyticsDashboard = {
     users: number;
   }>;
   conversions: Array<{
+    eventKey: string;
     eventName: string;
     count: number;
   }>;
@@ -62,6 +64,10 @@ function toNumber(value?: string) {
 
 function formatEventName(eventName: string) {
   return eventName.replace(/_/g, ' ');
+}
+
+function getDateRange(days: number) {
+  return [{ startDate: `${days}daysAgo`, endDate: 'today' }];
 }
 
 async function runAnalyticsRequest(
@@ -99,6 +105,7 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
 
   if (!trackingEnabled) {
     return {
+      dateRangeDays: 30,
       trackingId: null,
       trackingEnabled: false,
       reportingEnabled: false,
@@ -113,6 +120,7 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
 
   if (!reportingEnabled) {
     return {
+      dateRangeDays: 30,
       trackingId: config.trackingId,
       trackingEnabled: true,
       reportingEnabled: false,
@@ -142,7 +150,7 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
     const [summaryReport, realtimeReport, topPagesReport, topChannelsReport, conversionsReport] =
       await Promise.all([
         runAnalyticsRequest(accessToken, config.propertyId, 'runReport', {
-          dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+          dateRanges: getDateRange(30),
           metrics: [
             { name: 'totalUsers' },
             { name: 'sessions' },
@@ -155,21 +163,21 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
           metrics: [{ name: 'activeUsers' }],
         }),
         runAnalyticsRequest(accessToken, config.propertyId, 'runReport', {
-          dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+          dateRanges: getDateRange(30),
           dimensions: [{ name: 'pagePath' }],
           metrics: [{ name: 'screenPageViews' }, { name: 'sessions' }],
           orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
           limit: 5,
         }),
         runAnalyticsRequest(accessToken, config.propertyId, 'runReport', {
-          dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+          dateRanges: getDateRange(30),
           dimensions: [{ name: 'sessionDefaultChannelGroup' }],
           metrics: [{ name: 'sessions' }, { name: 'totalUsers' }],
           orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
           limit: 5,
         }),
         runAnalyticsRequest(accessToken, config.propertyId, 'runReport', {
-          dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+          dateRanges: getDateRange(30),
           dimensions: [{ name: 'eventName' }],
           metrics: [{ name: 'eventCount' }],
           dimensionFilter: {
@@ -188,6 +196,7 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
     const summaryMetrics = summaryReport.totals?.[0]?.metricValues || [];
 
     return {
+      dateRangeDays: 30,
       trackingId: config.trackingId,
       trackingEnabled: true,
       reportingEnabled: true,
@@ -213,6 +222,7 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
         users: toNumber(row.metricValues?.[1]?.value),
       })),
       conversions: (conversionsReport.rows || []).map((row) => ({
+        eventKey: row.dimensionValues?.[0]?.value || 'event',
         eventName: formatEventName(row.dimensionValues?.[0]?.value || 'event'),
         count: toNumber(row.metricValues?.[0]?.value),
       })),
@@ -221,6 +231,7 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
     console.error('Google Analytics dashboard error:', error);
 
     return {
+      dateRangeDays: 30,
       trackingId: config.trackingId,
       trackingEnabled: true,
       reportingEnabled: false,

@@ -3,7 +3,9 @@ import Link from 'next/link';
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import { logoutAction, updateLeadAction } from '@/app/admin/actions';
 import { requireAdminSession } from '@/lib/admin-auth';
+import { getGoogleAnalyticsDashboard } from '@/lib/google-analytics';
 import {
+  filterLeadsByAge,
   filterLeads,
   formatLeadReference,
   getLeadPipelineStatusLabel,
@@ -50,8 +52,16 @@ function formatCurrency(amountInCents: number) {
   }).format(amountInCents / 100);
 }
 
+function formatWholeNumber(value: number) {
+  return new Intl.NumberFormat('en-US').format(value);
+}
+
 function formatPercent(value: number) {
   return `${(value * 100).toFixed(1)}%`;
+}
+
+function divideOrZero(numerator: number, denominator: number) {
+  return denominator > 0 ? numerator / denominator : 0;
 }
 
 function normalizePipelineFilter(value?: string): LeadPipelineStatus | 'all' {
@@ -100,6 +110,13 @@ function getPipelineClasses(status: LeadPipelineStatus) {
     default:
       return 'border-white/15 bg-white/5 text-stone-200';
   }
+}
+
+function getConversionCount(
+  conversions: Array<{ eventKey: string; count: number }>,
+  eventKey: string
+) {
+  return conversions.find((conversion) => conversion.eventKey === eventKey)?.count || 0;
 }
 
 function LeadCard({ lead }: { lead: LeadRecord }) {
@@ -265,7 +282,7 @@ function LeadCard({ lead }: { lead: LeadRecord }) {
 export default async function AdminLeadsPage({ searchParams }: AdminLeadsPageProps) {
   await requireAdminSession();
 
-  const allLeads = await listLeads();
+  const [allLeads, analytics] = await Promise.all([listLeads(), getGoogleAnalyticsDashboard()]);
   const { error, pipelineStatus: rawPipelineStatus, query = '', source: rawSource } =
     await searchParams;
   const pipelineStatus = normalizePipelineFilter(rawPipelineStatus);
@@ -279,6 +296,22 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
 
   const wonStatuses = new Set<LeadPipelineStatus>(['won', 'scheduled', 'completed']);
   const openStatuses = new Set<LeadPipelineStatus>(['new', 'contacted', 'quoted']);
+  const analyticsWindowDays = analytics.dateRangeDays || 30;
+  const recentLeads = filterLeadsByAge(allLeads, analyticsWindowDays);
+  const recentQuoteRequests = recentLeads.filter((lead) => lead.source === 'quote_request');
+  const recentReservationStarts = recentLeads.filter((lead) => lead.source === 'reservation');
+  const recentPaidReservations = recentReservationStarts.filter(
+    (lead) => lead.paymentStatus === 'paid'
+  );
+  const recentWonLeads = recentLeads.filter((lead) => wonStatuses.has(lead.pipelineStatus));
+  const recentRevenue = recentPaidReservations.reduce(
+    (total, lead) => total + (lead.amountTotal || 0),
+    0
+  );
+  const sessionCount = analytics.summary?.sessions || 0;
+  const trackedLeadEvents = getConversionCount(analytics.conversions, 'generate_lead');
+  const trackedCheckoutStarts = getConversionCount(analytics.conversions, 'begin_checkout');
+  const trackedPurchases = getConversionCount(analytics.conversions, 'purchase');
   const stats = {
     total: allLeads.length,
     quoteRequests: allLeads.filter((lead) => lead.source === 'quote_request').length,
@@ -290,9 +323,26 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
         ? allLeads.filter((lead) => wonStatuses.has(lead.pipelineStatus)).length / allLeads.length
         : 0,
   };
+  const funnelStats = {
+    sessions: sessionCount,
+    capturedLeads: recentLeads.length,
+    quoteRequests: recentQuoteRequests.length,
+    reservationStarts: recentReservationStarts.length,
+    paidReservations: recentPaidReservations.length,
+    wonJobs: recentWonLeads.length,
+    recentRevenue,
+    trackedLeadEvents,
+    trackedCheckoutStarts,
+    trackedPurchases,
+    leadCaptureRate: divideOrZero(recentLeads.length, sessionCount),
+    checkoutStartRate: divideOrZero(trackedCheckoutStarts, sessionCount),
+    checkoutCompletionRate: divideOrZero(trackedPurchases, trackedCheckoutStarts),
+    leadToWinRate: divideOrZero(recentWonLeads.length, recentLeads.length),
+    averagePaidReservationValue: divideOrZero(recentRevenue, recentPaidReservations.length),
+  };
 
   const landingPages = Array.from(
-    allLeads.reduce((map, lead) => {
+    recentLeads.reduce((map, lead) => {
       const key = lead.landingPage || '(unknown)';
       map.set(key, (map.get(key) || 0) + 1);
       return map;
@@ -302,7 +352,7 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
     .slice(0, 4);
 
   const campaigns = Array.from(
-    allLeads.reduce((map, lead) => {
+    recentLeads.reduce((map, lead) => {
       const key =
         lead.utmCampaign ||
         [lead.utmSource, lead.utmMedium].filter(Boolean).join(' / ') ||
@@ -312,6 +362,15 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
         return map;
       }
 
+      map.set(key, (map.get(key) || 0) + 1);
+      return map;
+    }, new Map<string, number>())
+  )
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 4);
+  const referrers = Array.from(
+    recentLeads.reduce((map, lead) => {
+      const key = lead.referrerHost || 'direct';
       map.set(key, (map.get(key) || 0) + 1);
       return map;
     }, new Map<string, number>())
@@ -385,20 +444,174 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
 
       <section className="panel mt-8 rounded-[2rem] p-6 md:p-8">
         <div>
+          <p className="section-kicker">Funnel</p>
+          <h2 className="mt-3 font-serif text-3xl text-white">
+            {analyticsWindowDays}-day acquisition funnel
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-300">
+            Combine website sessions, tracked web events, and saved lead records to see what is
+            turning into paid and won work.
+          </p>
+        </div>
+
+        {analytics.message ? (
+          <p className="mt-6 rounded-2xl border border-amber-300/25 bg-amber-300/8 px-4 py-3 text-sm leading-7 text-stone-200">
+            {analytics.message}
+          </p>
+        ) : null}
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+              Sessions / {analyticsWindowDays} Days
+            </p>
+            <p className="mt-3 font-serif text-4xl text-white">
+              {formatWholeNumber(funnelStats.sessions)}
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+              Captured Leads / {analyticsWindowDays} Days
+            </p>
+            <p className="mt-3 font-serif text-4xl text-white">
+              {formatWholeNumber(funnelStats.capturedLeads)}
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+              Quote Requests / {analyticsWindowDays} Days
+            </p>
+            <p className="mt-3 font-serif text-4xl text-white">
+              {formatWholeNumber(funnelStats.quoteRequests)}
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-sky-400/20 bg-sky-400/8 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+              Reservation Starts / {analyticsWindowDays} Days
+            </p>
+            <p className="mt-3 font-serif text-4xl text-white">
+              {formatWholeNumber(funnelStats.reservationStarts)}
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-emerald-400/20 bg-emerald-400/8 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+              Paid Reservations / {analyticsWindowDays} Days
+            </p>
+            <p className="mt-3 font-serif text-4xl text-white">
+              {formatWholeNumber(funnelStats.paidReservations)}
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-amber-300/20 bg-amber-300/8 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+              Jobs Won / {analyticsWindowDays} Days
+            </p>
+            <p className="mt-3 font-serif text-4xl text-white">
+              {formatWholeNumber(funnelStats.wonJobs)}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-6 xl:grid-cols-3">
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Tracked Events</p>
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Project builder submits</span>
+                <span className="text-sm font-semibold text-white">
+                  {formatWholeNumber(funnelStats.trackedLeadEvents)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Checkout starts</span>
+                <span className="text-sm font-semibold text-white">
+                  {formatWholeNumber(funnelStats.trackedCheckoutStarts)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Stripe purchases</span>
+                <span className="text-sm font-semibold text-white">
+                  {formatWholeNumber(funnelStats.trackedPurchases)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Conversion Rates</p>
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Session to lead</span>
+                <span className="text-sm font-semibold text-white">
+                  {formatPercent(funnelStats.leadCaptureRate)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Session to checkout</span>
+                <span className="text-sm font-semibold text-white">
+                  {formatPercent(funnelStats.checkoutStartRate)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Checkout to purchase</span>
+                <span className="text-sm font-semibold text-white">
+                  {formatPercent(funnelStats.checkoutCompletionRate)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Lead to won job</span>
+                <span className="text-sm font-semibold text-white">
+                  {formatPercent(funnelStats.leadToWinRate)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+              Revenue Snapshot / {analyticsWindowDays} Days
+            </p>
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Paid reservation revenue</span>
+                <span className="text-sm font-semibold text-white">
+                  {formatCurrency(funnelStats.recentRevenue)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <span className="text-sm text-stone-200">Average paid reservation</span>
+                <span className="text-sm font-semibold text-white">
+                  {funnelStats.paidReservations > 0
+                    ? formatCurrency(funnelStats.averagePaidReservationValue)
+                    : '$0.00'}
+                </span>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm leading-7 text-stone-300">
+                Use the lead pipeline for quotes and follow-up, and use reservation operations for
+                delivery dates, payment status, and dispatch notes.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="panel mt-8 rounded-[2rem] p-6 md:p-8">
+        <div>
           <p className="section-kicker">Acquisition</p>
-          <h2 className="mt-3 font-serif text-3xl text-white">Lead source snapshot</h2>
+          <h2 className="mt-3 font-serif text-3xl text-white">
+            Lead source snapshot / {analyticsWindowDays} days
+          </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-300">
             See which landing pages, campaigns, and intake paths are creating actual opportunities
             for the business.
           </p>
         </div>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-3">
+        <div className="mt-6 grid gap-6 xl:grid-cols-4">
           <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
             <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Source Mix</p>
             <div className="mt-4 space-y-3">
               {leadSourceTypes.map((leadSource) => {
-                const count = allLeads.filter((lead) => lead.source === leadSource).length;
+                const count = recentLeads.filter((lead) => lead.source === leadSource).length;
 
                 return (
                   <div
@@ -450,6 +663,28 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
               ) : (
                 <p className="text-sm leading-7 text-stone-400">
                   Add UTM parameters to ads and campaign links to see marketing performance here.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Referrer Hosts</p>
+            <div className="mt-4 space-y-3">
+              {referrers.length > 0 ? (
+                referrers.map(([referrer, count]) => (
+                  <div
+                    key={referrer}
+                    className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3"
+                  >
+                    <span className="truncate text-sm text-stone-200">{referrer}</span>
+                    <span className="text-sm font-semibold text-white">{count}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm leading-7 text-stone-400">
+                  Referrer data will populate as new leads come in from search, ads, and partner
+                  links.
                 </p>
               )}
             </div>

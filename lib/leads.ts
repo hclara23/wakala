@@ -352,6 +352,14 @@ export function filterLeads(leads: LeadRecord[], filters: LeadFilters) {
   });
 }
 
+export function filterLeadsByAge(leads: LeadRecord[], days: number) {
+  const threshold = new Date();
+  threshold.setHours(0, 0, 0, 0);
+  threshold.setDate(threshold.getDate() - days);
+
+  return leads.filter((lead) => new Date(lead.createdAt) >= threshold);
+}
+
 export async function createContactLead(input: CreateContactLeadInput) {
   const attribution = normalizeLeadAttribution(input.attribution);
   const timestamp = nowIso();
