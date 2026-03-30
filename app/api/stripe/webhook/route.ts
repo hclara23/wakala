@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
+import { syncReservationFromCheckoutSession } from '@/lib/reservations';
 import { getStripe } from '@/lib/stripe';
 
 export const runtime = 'nodejs';
@@ -14,11 +15,16 @@ function getWebhookSecret() {
   return secret;
 }
 
-function buildWebhookLogPayload(session: Stripe.Checkout.Session) {
+function buildWebhookLogPayload(
+  session: Stripe.Checkout.Session,
+  reservationStatus?: string | null
+) {
   const metadata = session.metadata ?? {};
 
   return {
     sessionId: session.id,
+    reservationId: metadata.reservationId || null,
+    reservationStatus: reservationStatus || null,
     customerId: typeof session.customer === 'string' ? session.customer : session.customer?.id,
     customerEmail: session.customer_details?.email || metadata.email || null,
     customerName: session.customer_details?.name || metadata.customerName || null,
@@ -53,25 +59,28 @@ export async function POST(request: Request) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
+        const reservation = await syncReservationFromCheckoutSession(session, event.type);
         console.info(
           '[stripe-webhook] checkout.session.completed',
-          JSON.stringify(buildWebhookLogPayload(session))
+          JSON.stringify(buildWebhookLogPayload(session, reservation?.status))
         );
         break;
       }
       case 'checkout.session.async_payment_succeeded': {
         const session = event.data.object as Stripe.Checkout.Session;
+        const reservation = await syncReservationFromCheckoutSession(session, event.type);
         console.info(
           '[stripe-webhook] checkout.session.async_payment_succeeded',
-          JSON.stringify(buildWebhookLogPayload(session))
+          JSON.stringify(buildWebhookLogPayload(session, reservation?.status))
         );
         break;
       }
       case 'checkout.session.async_payment_failed': {
         const session = event.data.object as Stripe.Checkout.Session;
+        const reservation = await syncReservationFromCheckoutSession(session, event.type);
         console.warn(
           '[stripe-webhook] checkout.session.async_payment_failed',
-          JSON.stringify(buildWebhookLogPayload(session))
+          JSON.stringify(buildWebhookLogPayload(session, reservation?.status))
         );
         break;
       }

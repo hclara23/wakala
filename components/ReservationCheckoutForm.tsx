@@ -100,8 +100,8 @@ export default function ReservationCheckoutForm({
       <div className="flex items-start gap-3 rounded-[1.5rem] border border-amber-300/20 bg-amber-300/8 p-4 text-sm leading-6 text-stone-200">
         <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
         <p>
-          Start the reservation by confirming contact and delivery details here, then complete the
-          secure payment process.
+          Start the reservation by confirming contact and delivery details here. Wakala saves the
+          request immediately, then routes you to secure payment.
         </p>
       </div>
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { attachCheckoutSessionToReservation, createReservationDraft } from '@/lib/reservations';
 import { checkoutItems, type CheckoutItemId } from '@/lib/site-data';
 import { getCheckoutItem, getCheckoutPriceReference, getStripe, resolveBaseUrl } from '@/lib/stripe';
 
@@ -142,9 +143,14 @@ export async function POST(req: Request) {
     const stripe = getStripe();
     const appUrl = resolveBaseUrl(req);
     const metadata = buildMetadata(body);
+    const reservation = await createReservationDraft({
+      itemId,
+      ...metadata,
+    });
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
+      client_reference_id: reservation.id,
       customer_creation: 'always',
       customer_email: metadata.email,
       line_items: [getCheckoutPriceReference(itemId)],
@@ -160,38 +166,50 @@ export async function POST(req: Request) {
         receipt_email: metadata.email,
         metadata: {
           itemId,
+          reservationId: reservation.id,
           customerName: metadata.customerName,
           email: metadata.email,
           phone: metadata.phone,
+          addressLine1: metadata.addressLine1,
+          city: metadata.city,
+          state: metadata.state,
+          postalCode: metadata.postalCode,
           serviceAddress: metadata.serviceAddress,
           preferredDate: metadata.preferredDate,
           notes: metadata.notes,
         },
       },
-      success_url: `${appUrl}${item.successPath}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}${item.cancelPath}`,
+      success_url: `${appUrl}${item.successPath}?session_id={CHECKOUT_SESSION_ID}&reservation_id=${reservation.id}`,
+      cancel_url: `${appUrl}${item.cancelPath}?reservation_id=${reservation.id}`,
       custom_text: {
         submit: {
           message:
-            'Wakala will review your reservation and follow up to confirm delivery timing and placement.',
+            'Wakala will save your reservation, review the request, and confirm delivery timing and placement from the scheduling dashboard.',
         },
       },
       metadata: {
         itemId,
+        reservationId: reservation.id,
         customerName: metadata.customerName,
         email: metadata.email,
         phone: metadata.phone,
+        addressLine1: metadata.addressLine1,
+        city: metadata.city,
+        state: metadata.state,
+        postalCode: metadata.postalCode,
         serviceAddress: metadata.serviceAddress,
         preferredDate: metadata.preferredDate,
         notes: metadata.notes,
       },
     });
 
+    await attachCheckoutSessionToReservation(reservation.id, session);
+
     if (!session.url) {
       throw new Error('Checkout session URL was not created.');
     }
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: session.url, reservationId: reservation.id });
   } catch (error: unknown) {
     let message = 'Internal Server Error';
     if (error instanceof Error) {

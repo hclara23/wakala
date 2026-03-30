@@ -1,6 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
+import {
+  formatReservationReference,
+  getReservation,
+  getReservationPaymentStatusLabel,
+  getReservationStatusLabel,
+} from '@/lib/reservations';
 import { site } from '@/lib/site-data';
 import { formatCurrency, getStripe } from '@/lib/stripe';
 
@@ -18,37 +24,93 @@ export const dynamic = 'force-dynamic';
 type ThankYouPageProps = {
   searchParams: Promise<{
     session_id?: string;
+    reservation_id?: string;
   }>;
 };
 
-async function getReservationSummary(sessionId?: string) {
+async function getReservationSummary(sessionId?: string, reservationId?: string) {
+  const reservation = reservationId ? await getReservation(reservationId) : null;
+
   if (!sessionId) {
-    return null;
+    if (!reservation) {
+      return null;
+    }
+
+    return {
+      reservationId: reservation.id,
+      reservationStatus: getReservationStatusLabel(reservation.status),
+      paymentStatus: getReservationPaymentStatusLabel(reservation.paymentStatus),
+      customerName: reservation.customerName,
+      customerEmail: reservation.email,
+      serviceAddress: reservation.serviceAddress,
+      preferredDate: reservation.preferredDate,
+      amountTotal: formatCurrency(reservation.amountTotal, reservation.currency || 'usd'),
+      scheduledDate: reservation.scheduledDate,
+      scheduledWindow: reservation.scheduledWindow,
+    };
   }
 
   try {
     const stripe = getStripe();
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     const metadata = session.metadata ?? {};
+    const resolvedReservationId =
+      reservation?.id ||
+      (typeof metadata.reservationId === 'string' ? metadata.reservationId.trim().toLowerCase() : '');
+    const persistedReservation =
+      reservation || (resolvedReservationId ? await getReservation(resolvedReservationId) : null);
 
     return {
-      customerName: session.customer_details?.name || metadata.customerName || null,
-      customerEmail: session.customer_details?.email || metadata.email || null,
-      serviceAddress: metadata.serviceAddress || null,
-      preferredDate: metadata.preferredDate || null,
+      reservationId: resolvedReservationId || null,
+      reservationStatus: persistedReservation
+        ? getReservationStatusLabel(persistedReservation.status)
+        : session.payment_status === 'paid'
+          ? 'Pending schedule review'
+          : 'Awaiting payment',
+      customerName:
+        persistedReservation?.customerName ||
+        session.customer_details?.name ||
+        metadata.customerName ||
+        null,
+      customerEmail:
+        persistedReservation?.email || session.customer_details?.email || metadata.email || null,
+      serviceAddress: persistedReservation?.serviceAddress || metadata.serviceAddress || null,
+      preferredDate: persistedReservation?.preferredDate || metadata.preferredDate || null,
       amountTotal: formatCurrency(session.amount_total, session.currency || 'usd'),
-      paymentStatus: session.payment_status,
+      paymentStatus: persistedReservation
+        ? getReservationPaymentStatusLabel(persistedReservation.paymentStatus)
+        : session.payment_status === 'paid'
+          ? 'Paid'
+          : 'Unpaid',
+      scheduledDate: persistedReservation?.scheduledDate || null,
+      scheduledWindow: persistedReservation?.scheduledWindow || null,
     };
   } catch (error) {
     console.error('Unable to load Stripe session for thank-you page:', error);
-    return null;
+
+    if (!reservation) {
+      return null;
+    }
+
+    return {
+      reservationId: reservation.id,
+      reservationStatus: getReservationStatusLabel(reservation.status),
+      paymentStatus: getReservationPaymentStatusLabel(reservation.paymentStatus),
+      customerName: reservation.customerName,
+      customerEmail: reservation.email,
+      serviceAddress: reservation.serviceAddress,
+      preferredDate: reservation.preferredDate,
+      amountTotal: formatCurrency(reservation.amountTotal, reservation.currency || 'usd'),
+      scheduledDate: reservation.scheduledDate,
+      scheduledWindow: reservation.scheduledWindow,
+    };
   }
 }
 
 export default async function ThankYouPage({ searchParams }: ThankYouPageProps) {
-  const { session_id: sessionId } = await searchParams;
-  const summary = await getReservationSummary(sessionId);
-  const isPaid = summary?.paymentStatus === 'paid';
+  const { session_id: sessionId, reservation_id: reservationId } = await searchParams;
+  const summary = await getReservationSummary(sessionId, reservationId);
+  const isPaid = summary?.paymentStatus === 'Paid';
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
@@ -62,14 +124,28 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-stone-300">
           {isPaid
-            ? 'Stripe confirmed the payment and Wakala can now review the reservation details.'
-            : 'Wakala received the reservation details. If payment did not complete, contact the team directly and we can help finish scheduling.'}
+            ? 'Stripe confirmed the payment, your reservation is saved, and Wakala can now confirm the delivery window from the scheduling dashboard.'
+            : 'Wakala saved the reservation request. If payment did not complete, contact the team directly and we can help finish scheduling.'}
         </p>
 
         {summary ? (
           <div className="mx-auto mt-8 max-w-2xl rounded-[1.75rem] border border-white/10 bg-black/35 p-6 text-left">
             <p className="text-xs uppercase tracking-[0.28em] text-stone-400">Reservation Summary</p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Reference</p>
+                <p className="mt-2 text-sm leading-7 text-stone-200">
+                  {summary.reservationId
+                    ? formatReservationReference(summary.reservationId)
+                    : 'Not available'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Booking Status</p>
+                <p className="mt-2 text-sm leading-7 text-stone-200">
+                  {summary.reservationStatus || 'Pending review'}
+                </p>
+              </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Customer</p>
                 <p className="mt-2 text-sm leading-7 text-stone-200">
@@ -104,6 +180,18 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
                 <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Payment Status</p>
                 <p className="mt-2 text-sm leading-7 text-stone-200">
                   {summary.paymentStatus || 'Unknown'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Scheduled Date</p>
+                <p className="mt-2 text-sm leading-7 text-stone-200">
+                  {summary.scheduledDate || 'Pending confirmation'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Delivery Window</p>
+                <p className="mt-2 text-sm leading-7 text-stone-200">
+                  {summary.scheduledWindow || 'Pending confirmation'}
                 </p>
               </div>
             </div>

@@ -21,6 +21,9 @@ View your app in AI Studio: https://ai.studio/apps/037e4d61-0f20-4130-aec5-e2fd6
    - `STRIPE_SECRET_KEY`
    - `STRIPE_PRICE_DUMPSTER_15_RESERVATION`
    - `STRIPE_WEBHOOK_SECRET`
+   - `BLOB_READ_WRITE_TOKEN` for Vercel
+   - `ADMIN_RESERVATIONS_EMAIL`
+   - `ADMIN_RESERVATIONS_PASSWORD`
 3. Run the app:
    `npm run dev`
 
@@ -31,3 +34,10 @@ View your app in AI Studio: https://ai.studio/apps/037e4d61-0f20-4130-aec5-e2fd6
   `stripe listen --forward-to localhost:3000/api/stripe/webhook`
 - Subscribe the deployed webhook endpoint to:
   `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `checkout.session.async_payment_failed`.
+
+## Reservation Dashboard
+
+- On Vercel, reservations are stored durably using `BLOB_READ_WRITE_TOKEN`.
+- Netlify Blobs is still supported if the app is deployed there instead.
+- Local development falls back to `.data/reservations/`, which is ignored by Git.
+- Visit `/admin` and sign in with `ADMIN_RESERVATIONS_EMAIL` and `ADMIN_RESERVATIONS_PASSWORD` to review, confirm, or annotate reservation requests.

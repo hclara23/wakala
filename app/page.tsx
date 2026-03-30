@@ -353,8 +353,9 @@ export default function Home() {
                 Reserve your 15-yard dumpster instantly.
               </h2>
               <p className="max-w-2xl text-base leading-8 text-stone-300">
-                Confirm the jobsite details here, then complete your payment securely via Stripe. 
-                Wakala follows up immediately after payment to finalize scheduling and placement.
+                Confirm the jobsite details here, then complete your payment securely via Stripe.
+                The reservation is saved instantly and Wakala confirms the delivery window from the
+                scheduling dashboard after payment.
               </p>
             </div>
             

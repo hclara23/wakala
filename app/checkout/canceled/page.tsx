@@ -10,7 +10,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CheckoutCanceledPage() {
+type CheckoutCanceledPageProps = {
+  searchParams: Promise<{
+    reservation_id?: string;
+  }>;
+};
+
+export default async function CheckoutCanceledPage({
+  searchParams,
+}: CheckoutCanceledPageProps) {
+  const { reservation_id: reservationId } = await searchParams;
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
       <section className="panel rounded-[2rem] p-8 text-center md:p-12">
@@ -20,7 +30,9 @@ export default function CheckoutCanceledPage() {
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-stone-300">
           If you still want the dumpster reservation, you can return to the homepage and start
-          checkout again. For anything that needs a quote first, Wakala can scope it with a call.
+          checkout again. Your request was saved without a completed payment
+          {reservationId ? ` under reference ${reservationId.toUpperCase()}` : ''}. For anything
+          that needs a quote first, Wakala can scope it with a call.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link

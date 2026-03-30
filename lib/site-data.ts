@@ -73,7 +73,7 @@ export const checkoutItems = {
     id: 'dumpster_15_reservation',
     name: '15-Yard Dumpster Rental (Full Payment)',
     description:
-      'Full payment for a 15-yard roll-off dumpster for a three-day rental window. Scheduling is finalized directly with Wakala after checkout.',
+      'Full payment for a 15-yard roll-off dumpster for a three-day rental window. The reservation is saved immediately and scheduling is finalized by Wakala after payment.',
     priceEnvVar: 'STRIPE_PRICE_DUMPSTER_15_RESERVATION',
     unitAmount: 30000,
     buttonLabel: 'Complete full payment',
@@ -356,6 +356,8 @@ export type BlogSection = {
   heading: string;
   paragraphs: string[];
   list?: string[];
+  image?: SiteImage;
+  imageAlt?: string;
 };
 
 export type BlogFaq = {
@@ -685,6 +687,83 @@ export const blogPosts: BlogPost[] = [
         question: 'When does a small update become a remodel project?',
         answer:
           'When the scope shifts from repairs and swaps into layout changes, multiple finish replacements, or coordinated room refresh work.',
+      },
+    ],
+  },
+  {
+    slug: 'eviction-cleanout-story-tenant-left-belongings-nightmare',
+    title: 'When "Tenant Left Belongings" Turns Into a Full-Blown Horror Movie',
+    excerpt:
+      'A real-world eviction clean-out story from the Wakala crew. See how we transformed a property from a landlord’s nightmare back into a valuable asset.',
+    description:
+      'Eviction clean-outs can be overwhelming. Read our latest story on how Wakala handles extreme property recovery and hoarder remediation in El Paso.',
+    publishedAt: '2026-03-27',
+    readingTime: '7 min read',
+    coverImage: blogImageAssets.evictionHorror,
+    coverAlt: 'Extreme clutter and debris in a property after an eviction.',
+    tags: ['Eviction Cleanup', 'Property Recovery', 'El Paso'],
+    keywords: [
+      'eviction clean out El Paso',
+      'hoarder cleanup services',
+      'tenant left belongings help',
+      'property restoration cleanout',
+    ],
+    takeaways: [
+      'Landlords often underestimate the scale of a clean-out after a difficult eviction.',
+      'Professional property recovery requires a strategy, the right gear, and a fast-acting crew.',
+      'A extreme cleanup is the first step toward reclaiming your property value.',
+    ],
+    sections: [
+      {
+        heading: 'The Call That Started It All: "It’s Not That Bad"',
+        paragraphs: [
+          'Every great story in our line of work starts the same way: "Hey… it’s not that bad… just needs a quick clean-out." That’s what the landlord told us over the phone. Five minutes after walking through the front door, we realized we had been lied to.',
+          'The floor? Optional—completely hidden under layers of history. The mattress? Questionable, and possibly sentient. The smell? Let’s just say OSHA would’ve been busy filing paperwork.',
+        ],
+        image: galleryImageAssets.evictionHorror1,
+        imageAlt: 'Cluttered bedroom with trash covering the floor.',
+      },
+      {
+        heading: 'The Kitchen: A Crime Scene Against Humanity',
+        paragraphs: [
+          'If the bedroom was shocking, the kitchen was a crime scene. We found containers of food that had literally evolved, plastic bags within plastic bags, and mysterious liquids we collectively agreed to never identify.',
+          'At one point, a crew member asked, "Is that… soup?" We all decided it was better not to know and kept moving. Every job has that moment where you stop reacting and start attacking the problem.',
+        ],
+        image: galleryImageAssets.evictionHorror2,
+        imageAlt: 'Another angle of the extreme clutter and debris.',
+      },
+      {
+        heading: 'Turning Point: From Chaos to Control',
+        paragraphs: [
+          'Gloves on. Masks up. Trash bags ready. Systems activated. We moved from shock to strategy, from confusion to cleanup mode. Because this isn’t just cleaning—this is hoarder remediation and professional property recovery.',
+          'Piece by piece, the transformation started happening. Floors reappeared. Pathways formed. The air became breathable again. And yes—that mattress? Gone forever. One of the guys walked out carrying scrap like a trophy and said, "We’re taking this house back." And we did.',
+        ],
+        image: galleryImageAssets.evictionHorrorCrew,
+        imageAlt: 'Wakala crew member holding reclaimed metal scrap.',
+      },
+      {
+        heading: 'What Landlords Need to Know',
+        paragraphs: [
+          'Situations like this are more common than people think, especially after evictions. What looks minor over the phone can easily be a full hoarder situation once you’re inside. Delays mean more damage, more cost, and more stress.',
+          'This is where professional services matter. We don’t just show up with trash bags; we show up with a plan, a team, and the ability to handle the worst-case scenario. Whether it is eviction cleanup or full restoration prep, we fix it.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'How fast can Wakala respond to an eviction clean-out?',
+        answer:
+          'We prioritize property resets to help landlords minimize downtime. Scheduling is often handled same-week once we see the scope.',
+      },
+      {
+        question: 'Do you handle extreme hoarder situations?',
+        answer:
+          'Yes. We have the equipment and experience to manage hoarder remediation and property recovery projects of all scales.',
+      },
+      {
+        question: 'What happens to all the debris?',
+        answer:
+          'We use our own roll-off dumpsters and trailers to ensure all debris is removed quickly and disposed of properly.',
       },
     ],
   },
