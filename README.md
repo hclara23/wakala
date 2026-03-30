@@ -46,6 +46,8 @@ After login there are two working areas:
 - `/admin/reservations`
   Handles paid reservation operations including payment state, scheduling windows, dispatch notes, and Google Analytics traffic reporting.
 
+The admin pages also include a built-in workflow guide. It auto-opens on first visit for each browser and can be reopened from the page header to train new operators on intake, leads, quotes, jobs, reservations, reviews, and analytics.
+
 The built-in dashboard auth uses:
 
 - `ADMIN_RESERVATIONS_EMAIL`

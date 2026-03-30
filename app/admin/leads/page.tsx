@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AdminNavigation from '@/components/admin/AdminNavigation';
+import AdminWorkflowWizard from '@/components/admin/AdminWorkflowWizard';
 import { logoutAction, updateLeadAction } from '@/app/admin/actions';
 import { requireAdminSession } from '@/lib/admin-auth';
 import { getGoogleAnalyticsDashboard } from '@/lib/google-analytics';
@@ -678,6 +679,7 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
 
         <div className="flex flex-wrap gap-3">
           <AdminNavigation current="leads" />
+          <AdminWorkflowWizard current="leads" />
           <Link
             href="/"
             className="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white/50 hover:bg-white/5"
