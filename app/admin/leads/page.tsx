@@ -8,13 +8,23 @@ import {
   filterLeadsByAge,
   filterLeads,
   formatLeadReference,
+  getLeadFollowUpStatusLabel,
   getLeadPipelineStatusLabel,
+  getLeadQuoteStatusLabel,
+  getLeadReviewStatusLabel,
   getLeadSourceLabel,
+  isLeadFollowUpDue,
+  leadFollowUpStatuses,
   leadPipelineStatuses,
+  leadQuoteStatuses,
+  leadReviewStatuses,
   leadSourceTypes,
   listLeads,
+  type LeadFollowUpStatus,
   type LeadPipelineStatus,
+  type LeadQuoteStatus,
   type LeadRecord,
+  type LeadReviewStatus,
   type LeadSourceType,
 } from '@/lib/leads';
 import { formatReservationReference } from '@/lib/reservations';
@@ -45,11 +55,21 @@ function formatDateTime(value: string) {
   }).format(new Date(value));
 }
 
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'medium',
+  }).format(new Date(`${value}T00:00:00`));
+}
+
 function formatCurrency(amountInCents: number) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
   }).format(amountInCents / 100);
+}
+
+function formatCurrencyInput(amountInCents: number | null) {
+  return typeof amountInCents === 'number' ? (amountInCents / 100).toFixed(2) : '';
 }
 
 function formatWholeNumber(value: number) {
@@ -112,6 +132,48 @@ function getPipelineClasses(status: LeadPipelineStatus) {
   }
 }
 
+function getQuoteClasses(status: LeadQuoteStatus) {
+  switch (status) {
+    case 'accepted':
+      return 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100';
+    case 'sent':
+      return 'border-sky-400/30 bg-sky-400/10 text-sky-100';
+    case 'declined':
+      return 'border-red-500/30 bg-red-500/10 text-red-100';
+    case 'draft':
+      return 'border-amber-300/30 bg-amber-300/10 text-amber-100';
+    default:
+      return 'border-white/15 bg-white/5 text-stone-200';
+  }
+}
+
+function getReviewClasses(status: LeadReviewStatus) {
+  switch (status) {
+    case 'received':
+      return 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100';
+    case 'requested':
+      return 'border-sky-400/30 bg-sky-400/10 text-sky-100';
+    default:
+      return 'border-white/15 bg-white/5 text-stone-200';
+  }
+}
+
+function getFollowUpClasses(status: LeadFollowUpStatus, due: boolean) {
+  if (status === 'completed') {
+    return 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100';
+  }
+
+  if (due) {
+    return 'border-red-500/30 bg-red-500/10 text-red-100';
+  }
+
+  if (status === 'scheduled') {
+    return 'border-amber-300/30 bg-amber-300/10 text-amber-100';
+  }
+
+  return 'border-white/15 bg-white/5 text-stone-200';
+}
+
 function getConversionCount(
   conversions: Array<{ eventKey: string; count: number }>,
   eventKey: string
@@ -129,6 +191,9 @@ function LeadCard({ lead }: { lead: LeadRecord }) {
       lead.utmTerm ||
       lead.utmContent
   );
+  const followUpDue = isLeadFollowUpDue(lead);
+  const hasQuote = typeof lead.quoteAmount === 'number' || Boolean(lead.quoteSummary);
+  const hasJob = Boolean(lead.jobCreatedAt || lead.jobScheduledDate || lead.jobScheduledWindow);
 
   return (
     <article className="rounded-[2rem] border border-white/10 bg-black/35 p-6">
@@ -152,6 +217,28 @@ function LeadCard({ lead }: { lead: LeadRecord }) {
           </span>
           <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-stone-200">
             {getLeadSourceLabel(lead.source)}
+          </span>
+          <span
+            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] ${getQuoteClasses(
+              lead.quoteStatus
+            )}`}
+          >
+            {getLeadQuoteStatusLabel(lead.quoteStatus)}
+          </span>
+          <span
+            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] ${getFollowUpClasses(
+              lead.followUpStatus,
+              followUpDue
+            )}`}
+          >
+            {getLeadFollowUpStatusLabel(lead.followUpStatus)}
+          </span>
+          <span
+            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] ${getReviewClasses(
+              lead.reviewStatus
+            )}`}
+          >
+            {getLeadReviewStatusLabel(lead.reviewStatus)}
           </span>
         </div>
       </div>
@@ -211,10 +298,75 @@ function LeadCard({ lead }: { lead: LeadRecord }) {
         </div>
       </div>
 
+      <div className="mt-5 grid gap-4 text-sm leading-7 text-stone-200 md:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Follow-Up Reminder</p>
+          <p className="mt-2">
+            {lead.followUpDate
+              ? `${formatDate(lead.followUpDate)}${followUpDue ? ' - due now' : ''}`
+              : 'No reminder scheduled'}
+          </p>
+          <p className="text-stone-400">
+            {lead.followUpCompletedAt
+              ? `Completed ${formatDateTime(lead.followUpCompletedAt)}`
+              : 'Use reminders to keep callbacks from slipping.'}
+          </p>
+        </div>
+
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Quote Builder</p>
+          <p className="mt-2">
+            {typeof lead.quoteAmount === 'number'
+              ? formatCurrency(lead.quoteAmount)
+              : 'No quote amount saved'}
+          </p>
+          <p className="text-stone-400">
+            {lead.quoteSentAt
+              ? `Last sent ${formatDateTime(lead.quoteSentAt)}`
+              : 'Draft, send, and accept quotes from this card.'}
+          </p>
+        </div>
+
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Review Tracker</p>
+          <p className="mt-2">{getLeadReviewStatusLabel(lead.reviewStatus)}</p>
+          <p className="text-stone-400">
+            {lead.reviewReceivedAt
+              ? `Received ${formatDateTime(lead.reviewReceivedAt)}`
+              : lead.reviewRequestedAt
+                ? `Requested ${formatDateTime(lead.reviewRequestedAt)}`
+                : 'Request a review after the job is finished.'}
+          </p>
+        </div>
+
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Job Conversion</p>
+          <p className="mt-2">
+            {hasJob
+              ? lead.jobScheduledDate
+                ? `Scheduled ${formatDate(lead.jobScheduledDate)}`
+                : 'Converted to job'
+              : 'Not yet converted'}
+          </p>
+          <p className="text-stone-400">
+            {lead.jobScheduledWindow || 'Add a date/window and convert the quote into a live job.'}
+          </p>
+        </div>
+      </div>
+
       {lead.details ? (
         <div className="mt-5 rounded-[1.25rem] border border-white/10 bg-black/30 p-4 text-sm leading-7 text-stone-300">
           <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Lead Details</p>
           <p className="mt-2 whitespace-pre-line">{lead.details}</p>
+        </div>
+      ) : null}
+
+      {hasQuote ? (
+        <div className="mt-5 rounded-[1.25rem] border border-white/10 bg-black/30 p-4 text-sm leading-7 text-stone-300">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Quote Summary</p>
+          <p className="mt-2 whitespace-pre-line">
+            {lead.quoteSummary || 'Quote amount saved without a written summary yet.'}
+          </p>
         </div>
       ) : null}
 
@@ -232,24 +384,145 @@ function LeadCard({ lead }: { lead: LeadRecord }) {
         </div>
       ) : null}
 
-      <form action={updateLeadAction} className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.3fr_auto]">
+      <form action={updateLeadAction} className="mt-6 space-y-5">
         <input type="hidden" name="leadId" value={lead.id} />
+
+        <div className="grid gap-4 xl:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+              Pipeline Status
+            </label>
+            <select
+              name="pipelineStatus"
+              defaultValue={lead.pipelineStatus}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+            >
+              {leadPipelineStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {getLeadPipelineStatusLabel(status)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+              Follow-Up Status
+            </label>
+            <select
+              name="followUpStatus"
+              defaultValue={lead.followUpStatus}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+            >
+              {leadFollowUpStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {getLeadFollowUpStatusLabel(status)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+              Follow-Up Date
+            </label>
+            <input
+              name="followUpDate"
+              type="date"
+              defaultValue={lead.followUpDate}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+              Review Status
+            </label>
+            <select
+              name="reviewStatus"
+              defaultValue={lead.reviewStatus}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+            >
+              {leadReviewStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {getLeadReviewStatusLabel(status)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+              Quote Status
+            </label>
+            <select
+              name="quoteStatus"
+              defaultValue={lead.quoteStatus}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+            >
+              {leadQuoteStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {getLeadQuoteStatusLabel(status)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+              Quote Amount
+            </label>
+            <input
+              name="quoteAmount"
+              type="text"
+              inputMode="decimal"
+              defaultValue={formatCurrencyInput(lead.quoteAmount)}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+              placeholder="1250.00"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+              Job Date
+            </label>
+            <input
+              name="jobScheduledDate"
+              type="date"
+              defaultValue={lead.jobScheduledDate}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+              Job Window
+            </label>
+            <input
+              name="jobScheduledWindow"
+              type="text"
+              defaultValue={lead.jobScheduledWindow}
+              maxLength={120}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+              placeholder="Example: 9:00 AM to 11:00 AM"
+            />
+          </div>
+        </div>
 
         <div className="space-y-2">
           <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
-            Pipeline Status
+            Quote Scope
           </label>
-          <select
-            name="pipelineStatus"
-            defaultValue={lead.pipelineStatus}
-            className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
-          >
-            {leadPipelineStatuses.map((status) => (
-              <option key={status} value={status}>
-                {getLeadPipelineStatusLabel(status)}
-              </option>
-            ))}
-          </select>
+          <textarea
+            name="quoteSummary"
+            rows={3}
+            defaultValue={lead.quoteSummary}
+            maxLength={2400}
+            className="min-h-[7rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+            placeholder="Line items, exclusions, service notes, or what the quote includes."
+          />
         </div>
 
         <div className="space-y-2">
@@ -262,16 +535,26 @@ function LeadCard({ lead }: { lead: LeadRecord }) {
             defaultValue={lead.adminNotes}
             maxLength={1200}
             className="min-h-[7rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
-            placeholder="Quote amount, callback timing, objections, or next step"
+            placeholder="Callback timing, objections, crew notes, or customer preferences."
           />
         </div>
 
-        <div className="flex items-end">
+        <div className="flex flex-wrap gap-3">
           <button
             type="submit"
-            className="inline-flex w-full items-center justify-center rounded-2xl border border-amber-300/40 bg-amber-300 px-6 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-black transition hover:bg-amber-200"
+            name="intent"
+            value="save"
+            className="inline-flex items-center justify-center rounded-2xl border border-amber-300/40 bg-amber-300 px-6 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-black transition hover:bg-amber-200"
           >
             Save
+          </button>
+          <button
+            type="submit"
+            name="intent"
+            value="convert_to_job"
+            className="inline-flex items-center justify-center border border-white/15 px-6 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white/50 hover:bg-white/5"
+          >
+            Convert To Job
           </button>
         </div>
       </form>
@@ -318,6 +601,9 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
     reservationLeads: allLeads.filter((lead) => lead.source === 'reservation').length,
     openPipeline: allLeads.filter((lead) => openStatuses.has(lead.pipelineStatus)).length,
     closedWon: allLeads.filter((lead) => wonStatuses.has(lead.pipelineStatus)).length,
+    followUpsDue: allLeads.filter((lead) => isLeadFollowUpDue(lead)).length,
+    reviewRequestsOpen: allLeads.filter((lead) => lead.reviewStatus === 'requested').length,
+    activeQuotes: allLeads.filter((lead) => ['draft', 'sent'].includes(lead.quoteStatus)).length,
     closeRate:
       allLeads.length > 0
         ? allLeads.filter((lead) => wonStatuses.has(lead.pipelineStatus)).length / allLeads.length
@@ -439,6 +725,18 @@ export default async function AdminLeadsPage({ searchParams }: AdminLeadsPagePro
         <div className="rounded-[1.5rem] border border-sky-400/20 bg-sky-400/8 p-5">
           <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Close Rate</p>
           <p className="mt-3 font-serif text-4xl text-white">{formatPercent(stats.closeRate)}</p>
+        </div>
+        <div className="rounded-[1.5rem] border border-red-500/20 bg-red-500/8 p-5">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Follow-Ups Due</p>
+          <p className="mt-3 font-serif text-4xl text-white">{stats.followUpsDue}</p>
+        </div>
+        <div className="rounded-[1.5rem] border border-sky-400/20 bg-sky-400/8 p-5">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Reviews Requested</p>
+          <p className="mt-3 font-serif text-4xl text-white">{stats.reviewRequestsOpen}</p>
+        </div>
+        <div className="rounded-[1.5rem] border border-amber-300/20 bg-amber-300/8 p-5">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Active Quotes</p>
+          <p className="mt-3 font-serif text-4xl text-white">{stats.activeQuotes}</p>
         </div>
       </div>
 

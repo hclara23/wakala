@@ -15,7 +15,18 @@ import {
   updateReservationByAdmin,
   type ReservationStatus,
 } from '@/lib/reservations';
-import { leadPipelineStatuses, updateLeadByAdmin, type LeadPipelineStatus } from '@/lib/leads';
+import {
+  convertLeadToJob,
+  leadFollowUpStatuses,
+  leadPipelineStatuses,
+  leadQuoteStatuses,
+  leadReviewStatuses,
+  updateLeadByAdmin,
+  type LeadFollowUpStatus,
+  type LeadPipelineStatus,
+  type LeadQuoteStatus,
+  type LeadReviewStatus,
+} from '@/lib/leads';
 
 export async function loginAction(formData: FormData) {
   if (!isAdminAuthConfigured()) {
@@ -72,18 +83,53 @@ export async function updateLeadAction(formData: FormData) {
   await requireAdminSession();
 
   const leadId = String(formData.get('leadId') || '').trim();
+  const intent = String(formData.get('intent') || 'save').trim();
   const pipelineStatus = String(formData.get('pipelineStatus') || '').trim() as LeadPipelineStatus;
+  const followUpStatus = String(formData.get('followUpStatus') || '').trim() as LeadFollowUpStatus;
+  const followUpDate = String(formData.get('followUpDate') || '').trim();
+  const quoteStatus = String(formData.get('quoteStatus') || '').trim() as LeadQuoteStatus;
+  const quoteAmount = String(formData.get('quoteAmount') || '').trim();
+  const quoteSummary = String(formData.get('quoteSummary') || '').trim();
+  const reviewStatus = String(formData.get('reviewStatus') || '').trim() as LeadReviewStatus;
+  const jobScheduledDate = String(formData.get('jobScheduledDate') || '').trim();
+  const jobScheduledWindow = String(formData.get('jobScheduledWindow') || '').trim();
   const adminNotes = String(formData.get('adminNotes') || '').trim();
 
   if (!leadPipelineStatuses.includes(pipelineStatus)) {
     redirect('/admin/leads?error=invalid-status');
   }
 
+  if (!leadFollowUpStatuses.includes(followUpStatus)) {
+    redirect('/admin/leads?error=invalid-follow-up');
+  }
+
+  if (!leadQuoteStatuses.includes(quoteStatus)) {
+    redirect('/admin/leads?error=invalid-quote-status');
+  }
+
+  if (!leadReviewStatuses.includes(reviewStatus)) {
+    redirect('/admin/leads?error=invalid-review-status');
+  }
+
   try {
-    await updateLeadByAdmin(leadId, {
+    const payload = {
       adminNotes,
+      followUpDate,
+      followUpStatus,
+      jobScheduledDate,
+      jobScheduledWindow,
       pipelineStatus,
-    });
+      quoteAmount: quoteAmount || null,
+      quoteStatus,
+      quoteSummary,
+      reviewStatus,
+    };
+
+    if (intent === 'convert_to_job') {
+      await convertLeadToJob(leadId, payload);
+    } else {
+      await updateLeadByAdmin(leadId, payload);
+    }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'The lead could not be updated.';
     redirect(`/admin/leads?error=${encodeURIComponent(message)}`);

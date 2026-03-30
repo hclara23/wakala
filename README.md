@@ -42,7 +42,7 @@ The admin login lives at `/admin`.
 After login there are two working areas:
 
 - `/admin/leads`
-  Tracks quote requests and reservation starts in one pipeline. Includes source attribution, UTM data, follow-up notes, CSV export, and 30-day funnel reporting.
+  Tracks quote requests and reservation starts in one pipeline. Includes source attribution, UTM data, follow-up reminders, quote builder fields, review tracking, convert-to-job controls, CSV export, and 30-day funnel reporting.
 - `/admin/reservations`
   Handles paid reservation operations including payment state, scheduling windows, dispatch notes, and Google Analytics traffic reporting.
 
@@ -75,6 +75,13 @@ Both directories are ignored by Git.
 1. A visitor submits the project builder form.
 2. The app stores a lead with service type, contact info, notes, page attribution, referrer, and UTM values.
 3. The lead appears in `/admin/leads` for follow-up and pipeline updates.
+
+## Quote, Reminder, And Review Workflow
+
+- Use follow-up status and follow-up date on each lead card to track callbacks and overdue reminders.
+- Use quote status, quote amount, and quote scope to build and manage manual quotes.
+- Use `Convert To Job` on a lead card after the quote is ready. The lead is promoted into a live job stage and can carry a job date and service window.
+- Use review status to track when a review was requested and when it was received after the job is done.
 
 ## Google Analytics
 
