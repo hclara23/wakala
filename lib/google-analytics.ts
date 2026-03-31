@@ -17,6 +17,7 @@ export type GoogleAnalyticsDashboard = {
   trackingId: string | null;
   trackingEnabled: boolean;
   reportingEnabled: boolean;
+  missingConfiguration: string[];
   message: string | null;
   summary: {
     totalUsers: number;
@@ -43,13 +44,93 @@ export type GoogleAnalyticsDashboard = {
   }>;
 };
 
+type ServiceAccountJson = {
+  client_email?: string;
+  private_key?: string;
+};
+
+function firstNonEmpty(...values: Array<string | undefined>) {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return '';
+}
+
+function normalizePrivateKey(value: string) {
+  return value.replace(/\\n/g, '\n').trim();
+}
+
+function normalizePropertyId(value: string) {
+  return value.replace(/^properties\//, '').trim();
+}
+
 function getAnalyticsConfig() {
+  const serviceAccountJson =
+    firstNonEmpty(
+      process.env.GA_SERVICE_ACCOUNT_JSON,
+      process.env.GOOGLE_SERVICE_ACCOUNT_JSON
+    ) || '';
+
+  let parsedServiceAccountJson: ServiceAccountJson | null = null;
+  let invalidServiceAccountJson = false;
+
+  if (serviceAccountJson) {
+    try {
+      parsedServiceAccountJson = JSON.parse(serviceAccountJson) as ServiceAccountJson;
+    } catch {
+      invalidServiceAccountJson = true;
+    }
+  }
+
+  const propertyId = normalizePropertyId(
+    firstNonEmpty(
+      process.env.GA4_PROPERTY_ID,
+      process.env.GA_PROPERTY_ID,
+      process.env.GOOGLE_ANALYTICS_PROPERTY_ID
+    )
+  );
+  const serviceAccountEmail = firstNonEmpty(
+    process.env.GA_SERVICE_ACCOUNT_EMAIL,
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    parsedServiceAccountJson?.client_email
+  );
+  const privateKey = normalizePrivateKey(
+    firstNonEmpty(
+      process.env.GA_SERVICE_ACCOUNT_PRIVATE_KEY,
+      process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+      parsedServiceAccountJson?.private_key
+    )
+  );
+  const missingConfiguration: string[] = [];
+
+  if (!propertyId) {
+    missingConfiguration.push('GA4_PROPERTY_ID');
+  }
+
+  if (!serviceAccountEmail) {
+    missingConfiguration.push(
+      serviceAccountJson ? 'GA_SERVICE_ACCOUNT_EMAIL or valid GA_SERVICE_ACCOUNT_JSON' : 'GA_SERVICE_ACCOUNT_EMAIL'
+    );
+  }
+
+  if (!privateKey) {
+    missingConfiguration.push(
+      serviceAccountJson
+        ? 'GA_SERVICE_ACCOUNT_PRIVATE_KEY or valid GA_SERVICE_ACCOUNT_JSON'
+        : 'GA_SERVICE_ACCOUNT_PRIVATE_KEY'
+    );
+  }
+
   return {
-    trackingId: process.env.NEXT_PUBLIC_GA_ID?.trim() || '',
-    propertyId:
-      process.env.GA4_PROPERTY_ID?.trim() || process.env.GA_PROPERTY_ID?.trim() || '',
-    serviceAccountEmail: process.env.GA_SERVICE_ACCOUNT_EMAIL?.trim() || '',
-    privateKey: process.env.GA_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n') || '',
+    trackingId: firstNonEmpty(process.env.NEXT_PUBLIC_GA_ID),
+    propertyId,
+    serviceAccountEmail,
+    privateKey,
+    invalidServiceAccountJson,
+    missingConfiguration,
   };
 }
 
@@ -109,6 +190,7 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
       trackingId: null,
       trackingEnabled: false,
       reportingEnabled: false,
+      missingConfiguration: ['NEXT_PUBLIC_GA_ID'],
       message: 'Google Analytics tracking is not configured for this site yet.',
       summary: null,
       realtimeActiveUsers: null,
@@ -124,8 +206,11 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
       trackingId: config.trackingId,
       trackingEnabled: true,
       reportingEnabled: false,
+      missingConfiguration: config.missingConfiguration,
       message:
-        'Tracking is installed, but the admin dashboard still needs GA4 reporting credentials and property ID to show analytics.',
+        config.invalidServiceAccountJson
+          ? 'Tracking is installed, but the GA service account JSON could not be parsed. In Netlify, fix GA_SERVICE_ACCOUNT_JSON or use GA_SERVICE_ACCOUNT_EMAIL plus GA_SERVICE_ACCOUNT_PRIVATE_KEY, then trigger a fresh deploy.'
+          : `Tracking is installed, but dashboard reporting is still missing ${config.missingConfiguration.join(', ')}. In Netlify, add the missing production variables and trigger a fresh deploy.`,
       summary: null,
       realtimeActiveUsers: null,
       topPages: [],
@@ -200,6 +285,7 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
       trackingId: config.trackingId,
       trackingEnabled: true,
       reportingEnabled: true,
+      missingConfiguration: [],
       message: null,
       summary: {
         totalUsers: toNumber(summaryMetrics[0]?.value),
@@ -235,8 +321,9 @@ export async function getGoogleAnalyticsDashboard(): Promise<GoogleAnalyticsDash
       trackingId: config.trackingId,
       trackingEnabled: true,
       reportingEnabled: false,
+      missingConfiguration: config.missingConfiguration,
       message:
-        'Google Analytics tracking is present, but the dashboard could not read reporting data. Check the GA4 property ID, service account, and Analytics Data API access.',
+        'Google Analytics tracking is present, but the dashboard could not read reporting data. Check the GA4 property ID, service account access, and Analytics Data API enablement.',
       summary: null,
       realtimeActiveUsers: null,
       topPages: [],

@@ -21,8 +21,7 @@ Marketing site and admin dashboard for Wakala's dumpster reservations, quote int
    - `STRIPE_WEBHOOK_SECRET`
    - `NEXT_PUBLIC_GA_ID`
    - `GA4_PROPERTY_ID`
-   - `GA_SERVICE_ACCOUNT_EMAIL`
-   - `GA_SERVICE_ACCOUNT_PRIVATE_KEY`
+   - either `GA_SERVICE_ACCOUNT_EMAIL` plus `GA_SERVICE_ACCOUNT_PRIVATE_KEY`, or `GA_SERVICE_ACCOUNT_JSON`
    - `ADMIN_RESERVATIONS_EMAIL`
    - `ADMIN_RESERVATIONS_PASSWORD`
 4. Start the dev server:
@@ -92,8 +91,7 @@ The public site tag uses `NEXT_PUBLIC_GA_ID`.
 The admin dashboard can also read GA4 reporting data. That requires:
 
 - `GA4_PROPERTY_ID`
-- `GA_SERVICE_ACCOUNT_EMAIL`
-- `GA_SERVICE_ACCOUNT_PRIVATE_KEY`
+- either `GA_SERVICE_ACCOUNT_EMAIL` plus `GA_SERVICE_ACCOUNT_PRIVATE_KEY`, or `GA_SERVICE_ACCOUNT_JSON`
 
 The service account must have read access to the GA4 property and the Analytics Data API must be enabled.
 
