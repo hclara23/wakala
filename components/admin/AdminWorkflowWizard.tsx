@@ -44,6 +44,24 @@ function getWizardSteps(current: AdminWorkflowWizardProps['current']): WizardSte
       hrefLabel: 'Open lead inbox',
     },
     {
+      id: 'availability-setup',
+      eyebrow: 'First Setup',
+      title: 'Set the initial next available days first',
+      description:
+        'Before leads and reservations start moving, go to reservation operations and set the initial next available days for the 15-yard dumpster and for quotes.',
+      bullets: [
+        'Open Booking Controls on the reservations page before you start taking traffic from the site.',
+        'Set the initial next available dumpster day so customers cannot request dates earlier than you want to offer.',
+        'Set the initial next available quote day so the project builder shows the right callback or estimate window.',
+        'Then set daily capacity so the smart scheduler knows when to advance to the next opening automatically.',
+      ],
+      note:
+        'This is the first admin setup step. The manual dates act as the opening floor, and the scheduler builds smart next openings from there.',
+      accent: 'emerald',
+      href: '/admin/reservations#availability-controls',
+      hrefLabel: 'Set initial availability',
+    },
+    {
       id: 'leads',
       eyebrow: 'Lead Inbox',
       title: 'Use the lead inbox as the operating board',
@@ -100,16 +118,17 @@ function getWizardSteps(current: AdminWorkflowWizardProps['current']): WizardSte
       description:
         'Reservations are the dispatch lane for customers who already paid online and now need a confirmed date, time window, and internal handling.',
       bullets: [
+        'Booking Controls on this page are where you set the initial next available days for dumpsters and quotes.',
+        'Smart scheduling uses those starting days plus daily capacity to calculate the next opening shown on the public site.',
         'Paid revenue, pending review, unscheduled paid orders, and next-7-day counts tell you what needs attention first.',
         'Each reservation keeps payment state, preferred date, scheduled date, delivery window, and internal notes together.',
         'Lead cards can jump directly to linked reservations so quote history and paid fulfillment stay connected.',
-        'This page is the right place to confirm the window, update the status, and keep the crew aligned for delivery day.',
       ],
       note:
-        'Lead inbox is for selling and relationship management. Reservation operations is for confirming paid work and keeping dispatch clean.',
+        'Lead inbox is for selling and relationship management. Reservation operations is where availability is set, paid work is confirmed, and dispatch stays clean.',
       accent: 'sky',
-      href: '/admin/reservations',
-      hrefLabel: 'Open reservations',
+      href: '/admin/reservations#availability-controls',
+      hrefLabel: 'Open booking controls',
     },
     {
       id: 'analytics',
@@ -156,16 +175,17 @@ function getWizardSteps(current: AdminWorkflowWizardProps['current']): WizardSte
       description:
         'When paid reservations are already coming in, this page becomes the place to turn money collected online into a clean delivery schedule.',
       bullets: [
+        'Start by confirming the initial next available dumpster and quote days in Booking Controls.',
         'Check paid but unscheduled reservations before anything else.',
         'Set the delivery date and window so the crew knows what is locked in.',
         'Use internal notes for gate codes, placement instructions, or customer communication.',
         'Return to the lead inbox for quote follow-ups, review requests, and non-checkout service work.',
       ],
       note:
-        'Reservations should feel operational, not sales-oriented. Keep the page focused on confirmed work and schedule clarity.',
+        'Reservations should feel operational, not sales-oriented. Set the initial next available days first, then keep the page focused on confirmed work and schedule clarity.',
       accent: 'emerald',
-      href: '/admin/reservations',
-      hrefLabel: 'Work today from reservations',
+      href: '/admin/reservations#availability-controls',
+      hrefLabel: 'Start with booking controls',
     });
   }
 

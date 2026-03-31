@@ -417,14 +417,14 @@ export default async function AdminReservationsPage({
         </div>
       </div>
 
-      <section className="panel mt-8 rounded-[2rem] p-6 md:p-8">
+      <section id="availability-controls" className="panel mt-8 rounded-[2rem] p-6 md:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="section-kicker">Availability</p>
             <h2 className="mt-3 font-serif text-3xl text-white">Booking controls</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-300">
-              Set the next available dumpster reservation date and quote opening date from one
-              place. The public site will use these values to guide customers before they submit.
+              Set the initial next available booking day for dumpsters and quotes here, then let
+              the smart scheduler move forward automatically when those days fill up.
             </p>
           </div>
 
@@ -440,6 +440,9 @@ export default async function AdminReservationsPage({
             </p>
             <p className="mt-3 font-serif text-3xl text-white">
               {formatDate(availability.dumpster15.nextAvailableDate)}
+            </p>
+            <p className="mt-3 text-sm leading-7 text-stone-300">
+              Initial next available day: {formatDate(availability.dumpster15.manualFloorDate)}.
             </p>
             <p className="mt-3 text-sm leading-7 text-stone-300">
               {availability.dumpster15.bookedCountOnNextDate} booked /{' '}
@@ -458,6 +461,9 @@ export default async function AdminReservationsPage({
             <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Quote Requests</p>
             <p className="mt-3 font-serif text-3xl text-white">
               {formatDate(availability.quote.nextAvailableDate)}
+            </p>
+            <p className="mt-3 text-sm leading-7 text-stone-300">
+              Initial next available day: {formatDate(availability.quote.manualFloorDate)}.
             </p>
             <p className="mt-3 text-sm leading-7 text-stone-300">
               {availability.quote.bookedCountOnNextDate} booked / {availability.quote.dailyCapacity}{' '}
@@ -482,7 +488,7 @@ export default async function AdminReservationsPage({
               <div className="mt-4 space-y-4">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
-                    Do Not Allow Before
+                    Initial Next Available Day
                   </label>
                   <input
                     name="dumpster15ManualFloorDate"
@@ -490,6 +496,10 @@ export default async function AdminReservationsPage({
                     defaultValue={availability.settings.dumpster15ManualFloorDate}
                     className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                   />
+                  <p className="text-xs leading-6 text-stone-400">
+                    Customers cannot request a dumpster earlier than this day. If that day fills
+                    up, the smart scheduler advances to the next opening automatically.
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -504,6 +514,9 @@ export default async function AdminReservationsPage({
                     defaultValue={availability.settings.dumpster15DailyCapacity}
                     className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                   />
+                  <p className="text-xs leading-6 text-stone-400">
+                    Set how many 15-yard dumpster bookings can be scheduled on the same day.
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -529,7 +542,7 @@ export default async function AdminReservationsPage({
               <div className="mt-4 space-y-4">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
-                    Do Not Allow Before
+                    Initial Next Available Day
                   </label>
                   <input
                     name="quoteManualFloorDate"
@@ -537,6 +550,10 @@ export default async function AdminReservationsPage({
                     defaultValue={availability.settings.quoteManualFloorDate}
                     className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                   />
+                  <p className="text-xs leading-6 text-stone-400">
+                    This is the earliest day the site will present as open for quotes before smart
+                    scheduling accounts for already-booked quote slots.
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -551,6 +568,9 @@ export default async function AdminReservationsPage({
                     defaultValue={availability.settings.quoteDailyCapacity}
                     className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                   />
+                  <p className="text-xs leading-6 text-stone-400">
+                    Set how many quote callbacks, walk-throughs, or estimate slots you want open per day.
+                  </p>
                 </div>
 
                 <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-4 text-sm leading-7 text-stone-200">
