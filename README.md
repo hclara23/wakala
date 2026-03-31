@@ -21,7 +21,9 @@ Marketing site and admin dashboard for Wakala's dumpster reservations, quote int
    - `STRIPE_WEBHOOK_SECRET`
    - `NEXT_PUBLIC_GA_ID`
    - `GA4_PROPERTY_ID`
-   - either `GA_SERVICE_ACCOUNT_EMAIL` plus `GA_SERVICE_ACCOUNT_PRIVATE_KEY`, or `GA_SERVICE_ACCOUNT_JSON`
+   - either `GA_SERVICE_ACCOUNT_EMAIL` or `GA_CLIENT_EMAIL`
+   - `GA_SERVICE_ACCOUNT_PRIVATE_KEY`
+   - or `GA_SERVICE_ACCOUNT_JSON` instead of the email/private-key pair
    - `ADMIN_RESERVATIONS_EMAIL`
    - `ADMIN_RESERVATIONS_PASSWORD`
 4. Start the dev server:
@@ -46,6 +48,8 @@ After login there are two working areas:
   Handles paid reservation operations including payment state, scheduling windows, dispatch notes, Google Analytics traffic reporting, and public availability controls for dumpster bookings and quote intake.
 
 The admin pages also include a built-in workflow guide. It auto-opens on first visit for each browser and can be reopened from the page header to train new operators on intake, leads, quotes, jobs, reservations, reviews, and analytics.
+
+The wizard also points the admin to the first setup task on `/admin/reservations#availability-controls`, where they set the initial next available dumpster day and the initial next available quote day before live traffic starts using the forms.
 
 The built-in dashboard auth uses:
 
@@ -74,8 +78,9 @@ Both directories are ignored by Git.
 ## Availability Controls
 
 - `/admin/reservations` includes smart booking controls for the next available 15-yard dumpster date and the next available quote opening.
-- Dumpster openings are computed from scheduled reservation dates plus the configured daily dumpster capacity.
-- Quote openings are computed from scheduled lead follow-up dates plus the configured daily quote capacity.
+- The admin sets an initial next available day for each booking type, and that acts as the earliest allowed floor date for the public site.
+- Dumpster openings are computed from that floor date, scheduled reservation dates, and the configured daily dumpster capacity.
+- Quote openings are computed from that floor date, scheduled lead follow-up dates, the configured daily quote capacity, and the optional weekday-only rule.
 - The homepage booking section shows those computed opening dates to customers.
 - The checkout API rejects dumpster preferred dates that are earlier than the allowed floor date or already full for the selected day.
 
@@ -99,9 +104,16 @@ The public site tag uses `NEXT_PUBLIC_GA_ID`.
 The admin dashboard can also read GA4 reporting data. That requires:
 
 - `GA4_PROPERTY_ID`
-- either `GA_SERVICE_ACCOUNT_EMAIL` plus `GA_SERVICE_ACCOUNT_PRIVATE_KEY`, or `GA_SERVICE_ACCOUNT_JSON`
+- either `GA_SERVICE_ACCOUNT_EMAIL` or `GA_CLIENT_EMAIL`
+- `GA_SERVICE_ACCOUNT_PRIVATE_KEY`
+- or `GA_SERVICE_ACCOUNT_JSON`
 
-The service account must have read access to the GA4 property and the Analytics Data API must be enabled.
+Important:
+
+- `GA4_PROPERTY_ID` must be the numeric GA4 property ID such as `123456789`, not the public measurement ID such as `G-XXXXXXXXXX`.
+- The service account must be added directly to the GA4 property with reporting access.
+- The Google Analytics Data API must be enabled in the same Google Cloud project as the service account.
+- If Netlify environment variables change, trigger a fresh deploy so the server-rendered dashboard picks them up.
 
 Current admin reporting includes:
 
@@ -110,6 +122,13 @@ Current admin reporting includes:
 - top traffic channels
 - tracked events for `generate_lead`, `begin_checkout`, and `purchase`
 - a 30-day acquisition funnel inside the lead inbox
+
+If the analytics card shows an error banner:
+
+- `could not find GA4 property` usually means `GA4_PROPERTY_ID` is wrong or is still set to the public `G-...` ID.
+- `denied reporting access` usually means the service account has not been added to the GA4 property, or the Analytics Data API is not enabled.
+- `rejected the service-account credentials` usually means the private key or service account email was pasted incorrectly.
+- If only one analytics subsection fails, the dashboard now keeps the rest of the reporting visible and shows a targeted warning instead of blanking the whole panel.
 
 ## Stripe Webhooks
 
@@ -132,3 +151,4 @@ For local webhook testing with Stripe CLI:
 - The project is intended to deploy from GitHub to Netlify.
 - Make sure the environment variables above are set in Netlify before deploying.
 - If admin or analytics settings change in Netlify, trigger a fresh deploy so server-rendered pages pick up the new values.
+- On Personal Netlify plans, deploys can queue behind older builds. If an urgent fix is waiting in queue, cancel the older in-progress deploy and let the newer commit build.
