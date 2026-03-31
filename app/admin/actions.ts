@@ -10,6 +10,7 @@ import {
   requireAdminSession,
   setAdminSession,
 } from '@/lib/admin-auth';
+import { updateAvailabilitySettings } from '@/lib/availability';
 import {
   reservationStatuses,
   updateReservationByAdmin,
@@ -77,6 +78,33 @@ export async function updateReservationAction(formData: FormData) {
 
   revalidatePath('/admin/reservations');
   revalidatePath('/admin/leads');
+}
+
+export async function updateAvailabilityAction(formData: FormData) {
+  await requireAdminSession();
+
+  const dumpster15NextAvailableDate = String(
+    formData.get('dumpster15NextAvailableDate') || ''
+  ).trim();
+  const dumpster15Note = String(formData.get('dumpster15Note') || '').trim();
+  const quoteNextAvailableDate = String(formData.get('quoteNextAvailableDate') || '').trim();
+  const quoteNote = String(formData.get('quoteNote') || '').trim();
+
+  try {
+    await updateAvailabilitySettings({
+      dumpster15NextAvailableDate,
+      dumpster15Note,
+      quoteNextAvailableDate,
+      quoteNote,
+    });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Availability settings could not be updated.';
+    redirect(`/admin/reservations?error=${encodeURIComponent(message)}`);
+  }
+
+  revalidatePath('/');
+  revalidatePath('/admin/reservations');
 }
 
 export async function updateLeadAction(formData: FormData) {

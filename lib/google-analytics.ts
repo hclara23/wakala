@@ -94,6 +94,7 @@ function getAnalyticsConfig() {
   );
   const serviceAccountEmail = firstNonEmpty(
     process.env.GA_SERVICE_ACCOUNT_EMAIL,
+    process.env.GA_CLIENT_EMAIL,
     process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
     parsedServiceAccountJson?.client_email
   );

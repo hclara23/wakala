@@ -16,6 +16,11 @@ import { getClientLeadAttribution } from '@/lib/lead-attribution';
 import { getProjectTypeLabel, projectTypeOptions } from '@/lib/project-types';
 import { trackEvent } from '@/lib/gtag';
 
+type CreativeContactFormProps = {
+  nextAvailableDate: string;
+  availabilityNote?: string;
+};
+
 const projectTypeIcons = {
   dumpster: Trash2,
   washing: Droplet,
@@ -25,7 +30,16 @@ const projectTypeIcons = {
   hauling: Truck,
 } as const;
 
-export default function CreativeContactForm() {
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'medium',
+  }).format(new Date(`${value}T00:00:00`));
+}
+
+export default function CreativeContactForm({
+  nextAvailableDate,
+  availabilityNote,
+}: CreativeContactFormProps) {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -104,6 +118,13 @@ export default function CreativeContactForm() {
         <p className="mt-3 text-sm leading-7 text-stone-400">
           Select a service type below to start your inquiry.
         </p>
+        <div className="mt-5 rounded-[1.5rem] border border-sky-400/20 bg-sky-400/8 p-4 text-sm leading-6 text-stone-200">
+          <p className="text-xs uppercase tracking-[0.24em] text-stone-400">Quote Availability</p>
+          <p className="mt-2 text-white">Next available quote opening: {formatDate(nextAvailableDate)}</p>
+          <p className="mt-2 text-stone-300">
+            {availabilityNote || 'Use this form to lock in the next open quote slot for your project.'}
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">

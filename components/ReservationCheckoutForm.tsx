@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Loader2, LockKeyhole } from 'lucide-react';
+import type { AvailabilitySettings } from '@/lib/availability';
 import { getClientLeadAttribution } from '@/lib/lead-attribution';
 import { trackEvent } from '@/lib/gtag';
 import type { CheckoutItemId } from '@/lib/site-data';
@@ -35,20 +36,39 @@ interface ReservationCheckoutFormProps {
   itemId: CheckoutItemId;
   itemLabel: string;
   buttonLabel: string;
+  nextAvailableDate: AvailabilitySettings['dumpster15NextAvailableDate'];
+  availabilityNote?: string;
   className?: string;
+}
+
+function getTodayDateString() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function resolveMinDate(nextAvailableDate: string) {
+  const today = getTodayDateString();
+  return nextAvailableDate > today ? nextAvailableDate : today;
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'medium',
+  }).format(new Date(`${value}T00:00:00`));
 }
 
 export default function ReservationCheckoutForm({
   itemId,
   itemLabel,
   buttonLabel,
+  nextAvailableDate,
+  availabilityNote,
   className,
 }: ReservationCheckoutFormProps) {
   const [formState, setFormState] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const minDate = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const minDate = useMemo(() => resolveMinDate(nextAvailableDate), [nextAvailableDate]);
 
   function updateField(field: keyof ReservationFormState, value: string) {
     setFormState((current) => ({
@@ -112,6 +132,16 @@ export default function ReservationCheckoutForm({
         <p>
           Start the reservation by confirming contact and delivery details here. Wakala saves the
           request immediately, then routes you to secure payment.
+        </p>
+      </div>
+
+      <div className="rounded-[1.5rem] border border-emerald-400/20 bg-emerald-400/8 p-4 text-sm leading-6 text-stone-200">
+        <p className="text-xs uppercase tracking-[0.24em] text-stone-400">Current Availability</p>
+        <p className="mt-2 text-white">
+          Next available 15-yard dumpster date: {formatDate(minDate)}
+        </p>
+        <p className="mt-2 text-stone-300">
+          {availabilityNote || 'Choose a preferred delivery date on or after the next available opening.'}
         </p>
       </div>
 
@@ -253,11 +283,15 @@ export default function ReservationCheckoutForm({
             id="preferredDate"
             name="preferredDate"
             type="date"
+            required
             min={minDate}
             value={formState.preferredDate}
             onChange={(event) => updateField('preferredDate', event.target.value)}
             className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
           />
+          <p className="text-xs leading-6 text-stone-400">
+            Earliest available opening: {formatDate(minDate)}
+          </p>
         </div>
 
         <div className="space-y-2">

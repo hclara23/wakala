@@ -2,8 +2,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import AdminWorkflowWizard from '@/components/admin/AdminWorkflowWizard';
-import { logoutAction, updateReservationAction } from '@/app/admin/actions';
+import {
+  logoutAction,
+  updateAvailabilityAction,
+  updateReservationAction,
+} from '@/app/admin/actions';
 import { requireAdminSession } from '@/lib/admin-auth';
+import { getAvailabilitySettings } from '@/lib/availability';
 import { getGoogleAnalyticsDashboard } from '@/lib/google-analytics';
 import {
   filterReservations,
@@ -297,9 +302,10 @@ export default async function AdminReservationsPage({
 }: AdminReservationsPageProps) {
   await requireAdminSession();
 
-  const [allReservations, analytics] = await Promise.all([
+  const [allReservations, analytics, availability] = await Promise.all([
     listReservations(),
     getGoogleAnalyticsDashboard(),
+    getAvailabilitySettings(),
   ]);
   const { error, paymentStatus: rawPaymentStatus, query = '', status: rawStatus } =
     await searchParams;
@@ -403,6 +409,133 @@ export default async function AdminReservationsPage({
           <p className="mt-3 font-serif text-4xl text-white">{stats.attention}</p>
         </div>
       </div>
+
+      <section className="panel mt-8 rounded-[2rem] p-6 md:p-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="section-kicker">Availability</p>
+            <h2 className="mt-3 font-serif text-3xl text-white">Booking controls</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-300">
+              Set the next available dumpster reservation date and quote opening date from one
+              place. The public site will use these values to guide customers before they submit.
+            </p>
+          </div>
+
+          <div className="rounded-[1.25rem] border border-white/10 bg-black/30 px-4 py-3 text-sm text-stone-300">
+            Last updated: {formatDateTime(availability.updatedAt)}
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 xl:grid-cols-2">
+          <div className="rounded-[1.5rem] border border-emerald-400/20 bg-emerald-400/8 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+              15-Yard Dumpster
+            </p>
+            <p className="mt-3 font-serif text-3xl text-white">
+              {formatDate(availability.dumpster15NextAvailableDate)}
+            </p>
+            <p className="mt-3 text-sm leading-7 text-stone-300">
+              Checkout requests cannot choose a preferred date earlier than this.
+            </p>
+            <p className="mt-3 text-sm leading-7 text-stone-400">
+              {availability.dumpster15Note || 'No extra dumpster note is currently shown to customers.'}
+            </p>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-sky-400/20 bg-sky-400/8 p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Quote Requests</p>
+            <p className="mt-3 font-serif text-3xl text-white">
+              {formatDate(availability.quoteNextAvailableDate)}
+            </p>
+            <p className="mt-3 text-sm leading-7 text-stone-300">
+              The homepage quote section uses this to set expectations for callbacks and site
+              visits.
+            </p>
+            <p className="mt-3 text-sm leading-7 text-stone-400">
+              {availability.quoteNote || 'No extra quote note is currently shown to customers.'}
+            </p>
+          </div>
+        </div>
+
+        <form action={updateAvailabilityAction} className="mt-6 space-y-5">
+          <div className="grid gap-5 xl:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
+              <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+                Dumpster reservation settings
+              </p>
+              <div className="mt-4 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+                    Next Available Date
+                  </label>
+                  <input
+                    name="dumpster15NextAvailableDate"
+                    type="date"
+                    defaultValue={availability.dumpster15NextAvailableDate}
+                    className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+                    Customer Note
+                  </label>
+                  <textarea
+                    name="dumpster15Note"
+                    rows={3}
+                    defaultValue={availability.dumpster15Note}
+                    maxLength={400}
+                    className="min-h-[7rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+                    placeholder="Example: Limited weekday inventory this week. Book early morning deliveries first."
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
+              <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
+                Quote intake settings
+              </p>
+              <div className="mt-4 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+                    Next Available Date
+                  </label>
+                  <input
+                    name="quoteNextAvailableDate"
+                    type="date"
+                    defaultValue={availability.quoteNextAvailableDate}
+                    className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+                    Customer Note
+                  </label>
+                  <textarea
+                    name="quoteNote"
+                    rows={3}
+                    defaultValue={availability.quoteNote}
+                    maxLength={400}
+                    className="min-h-[7rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+                    placeholder="Example: Quotes are currently opening for the next business day. Include photos if the scope is unusual."
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-2xl border border-amber-300/40 bg-amber-300 px-6 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-black transition hover:bg-amber-200"
+            >
+              Save availability
+            </button>
+          </div>
+        </form>
+      </section>
 
       <section className="panel mt-8 rounded-[2rem] p-6 md:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">

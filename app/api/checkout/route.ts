@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getAvailabilitySettings, getEffectiveAvailableDate } from '@/lib/availability';
 import type { LeadAttributionInput } from '@/lib/lead-attribution';
 import { attachCheckoutSessionToReservation, createReservationDraft } from '@/lib/reservations';
 import { checkoutItems, type CheckoutItemId } from '@/lib/site-data';
@@ -88,14 +89,7 @@ function validatePostalCode(value: unknown) {
 }
 
 function validatePreferredDate(value: unknown) {
-  const preferredDate = getTextField(value, 'Preferred date', {
-    required: false,
-    maxLength: 10,
-  });
-
-  if (!preferredDate) {
-    return '';
-  }
+  const preferredDate = getTextField(value, 'Preferred date', { maxLength: 10 });
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(preferredDate)) {
     throw new Error('Preferred date must use YYYY-MM-DD format.');
@@ -145,6 +139,17 @@ export async function POST(req: Request) {
     const stripe = getStripe();
     const appUrl = resolveBaseUrl(req);
     const metadata = buildMetadata(body);
+    const availability = await getAvailabilitySettings();
+    const earliestAvailableDate = getEffectiveAvailableDate(
+      availability.dumpster15NextAvailableDate
+    );
+
+    if (metadata.preferredDate && metadata.preferredDate < earliestAvailableDate) {
+      throw new Error(
+        `The earliest available 15-yard dumpster date is ${earliestAvailableDate}.`
+      );
+    }
+
     const reservation = await createReservationDraft({
       attribution: body.attribution,
       itemId,

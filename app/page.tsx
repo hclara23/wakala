@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, Phone, ShieldCheck, Sparkles } from 'lucide-r
 import ReservationCheckoutForm from '@/components/ReservationCheckoutForm';
 import Testimonials from '@/components/Testimonials';
 import CreativeContactForm from '@/components/CreativeContactForm';
+import { getAvailabilitySettings } from '@/lib/availability';
 import {
   checkoutItems,
   companyPrinciples,
@@ -15,7 +16,9 @@ import {
 
 const paymentItem = checkoutItems.dumpster_15_reservation;
 
-export default function Home() {
+export default async function Home() {
+  const availability = await getAvailabilitySettings();
+
   return (
     <>
       <section className="relative overflow-hidden border-b border-white/10">
@@ -368,6 +371,8 @@ export default function Home() {
                 itemId={paymentItem.id}
                 itemLabel={paymentItem.reservationLabel}
                 buttonLabel={paymentItem.buttonLabel}
+                nextAvailableDate={availability.dumpster15NextAvailableDate}
+                availabilityNote={availability.dumpster15Note}
                 className="mt-8"
               />
             </div>
@@ -384,7 +389,10 @@ export default function Home() {
                 tell us about your project and we&apos;ll get back to you with pricing.
               </p>
             </div>
-            <CreativeContactForm />
+            <CreativeContactForm
+              nextAvailableDate={availability.quoteNextAvailableDate}
+              availabilityNote={availability.quoteNote}
+            />
           </div>
         </div>
       </section>

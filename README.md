@@ -43,7 +43,7 @@ After login there are two working areas:
 - `/admin/leads`
   Tracks quote requests and reservation starts in one pipeline. Includes source attribution, UTM data, follow-up reminders, quote builder fields, review tracking, convert-to-job controls, CSV export, and 30-day funnel reporting.
 - `/admin/reservations`
-  Handles paid reservation operations including payment state, scheduling windows, dispatch notes, and Google Analytics traffic reporting.
+  Handles paid reservation operations including payment state, scheduling windows, dispatch notes, Google Analytics traffic reporting, and public availability controls for dumpster bookings and quote intake.
 
 The admin pages also include a built-in workflow guide. It auto-opens on first visit for each browser and can be reopened from the page header to train new operators on intake, leads, quotes, jobs, reservations, reviews, and analytics.
 
@@ -70,6 +70,12 @@ Both directories are ignored by Git.
 3. Stripe Checkout collects payment.
 4. Stripe webhook events sync payment status back into the reservation and lead records.
 5. Wakala confirms the delivery window from the reservation dashboard.
+
+## Availability Controls
+
+- `/admin/reservations` includes booking controls for the next available 15-yard dumpster date and the next available quote opening.
+- The homepage booking section shows those availability dates to customers.
+- The checkout API rejects dumpster preferred dates that are earlier than the admin-set next available date.
 
 ## Quote And Lead Flow
 
