@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
-import { getAvailabilitySettings, getEffectiveAvailableDate } from '@/lib/availability';
+import {
+  getAvailabilitySettings,
+  getRequestedDumpsterDateAvailability,
+} from '@/lib/availability';
 import type { LeadAttributionInput } from '@/lib/lead-attribution';
-import { attachCheckoutSessionToReservation, createReservationDraft } from '@/lib/reservations';
+import {
+  attachCheckoutSessionToReservation,
+  createReservationDraft,
+  listReservations,
+} from '@/lib/reservations';
 import { checkoutItems, type CheckoutItemId } from '@/lib/site-data';
 import { getCheckoutItem, getCheckoutPriceReference, getStripe, resolveBaseUrl } from '@/lib/stripe';
 
@@ -139,14 +146,21 @@ export async function POST(req: Request) {
     const stripe = getStripe();
     const appUrl = resolveBaseUrl(req);
     const metadata = buildMetadata(body);
-    const availability = await getAvailabilitySettings();
-    const earliestAvailableDate = getEffectiveAvailableDate(
-      availability.dumpster15NextAvailableDate
-    );
+    const [availabilitySettings, reservations] = await Promise.all([
+      getAvailabilitySettings(),
+      listReservations(),
+    ]);
+    const requestedDateAvailability = getRequestedDumpsterDateAvailability({
+      date: metadata.preferredDate,
+      reservations,
+      settings: availabilitySettings,
+    });
 
-    if (metadata.preferredDate && metadata.preferredDate < earliestAvailableDate) {
+    if (!requestedDateAvailability.isAvailable) {
       throw new Error(
-        `The earliest available 15-yard dumpster date is ${earliestAvailableDate}.`
+        requestedDateAvailability.reason === 'before_floor'
+          ? `The earliest available 15-yard dumpster date is ${requestedDateAvailability.nextAvailableDate}.`
+          : `That preferred dumpster date is already full. The next available opening is ${requestedDateAvailability.nextAvailableDate}.`
       );
     }
 

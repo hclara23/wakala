@@ -8,8 +8,9 @@ import {
   updateReservationAction,
 } from '@/app/admin/actions';
 import { requireAdminSession } from '@/lib/admin-auth';
-import { getAvailabilitySettings } from '@/lib/availability';
+import { buildAvailabilitySnapshot, getAvailabilitySettings } from '@/lib/availability';
 import { getGoogleAnalyticsDashboard } from '@/lib/google-analytics';
+import { listLeads } from '@/lib/leads';
 import {
   filterReservations,
   formatReservationReference,
@@ -302,11 +303,17 @@ export default async function AdminReservationsPage({
 }: AdminReservationsPageProps) {
   await requireAdminSession();
 
-  const [allReservations, analytics, availability] = await Promise.all([
+  const [allReservations, allLeads, analytics, availabilitySettings] = await Promise.all([
     listReservations(),
+    listLeads(),
     getGoogleAnalyticsDashboard(),
     getAvailabilitySettings(),
   ]);
+  const availability = buildAvailabilitySnapshot({
+    leads: allLeads,
+    reservations: allReservations,
+    settings: availabilitySettings,
+  });
   const { error, paymentStatus: rawPaymentStatus, query = '', status: rawStatus } =
     await searchParams;
   const status = normalizeStatusFilter(rawStatus);
@@ -422,7 +429,7 @@ export default async function AdminReservationsPage({
           </div>
 
           <div className="rounded-[1.25rem] border border-white/10 bg-black/30 px-4 py-3 text-sm text-stone-300">
-            Last updated: {formatDateTime(availability.updatedAt)}
+            Last updated: {formatDateTime(availability.settings.updatedAt)}
           </div>
         </div>
 
@@ -432,27 +439,36 @@ export default async function AdminReservationsPage({
               15-Yard Dumpster
             </p>
             <p className="mt-3 font-serif text-3xl text-white">
-              {formatDate(availability.dumpster15NextAvailableDate)}
+              {formatDate(availability.dumpster15.nextAvailableDate)}
             </p>
             <p className="mt-3 text-sm leading-7 text-stone-300">
-              Checkout requests cannot choose a preferred date earlier than this.
+              {availability.dumpster15.bookedCountOnNextDate} booked /{' '}
+              {availability.dumpster15.dailyCapacity} daily capacity.{' '}
+              {availability.dumpster15.remainingSlotsOnNextDate} slot
+              {availability.dumpster15.remainingSlotsOnNextDate === 1 ? '' : 's'} open on this
+              date.
             </p>
             <p className="mt-3 text-sm leading-7 text-stone-400">
-              {availability.dumpster15Note || 'No extra dumpster note is currently shown to customers.'}
+              {availability.settings.dumpster15Note ||
+                'No extra dumpster note is currently shown to customers.'}
             </p>
           </div>
 
           <div className="rounded-[1.5rem] border border-sky-400/20 bg-sky-400/8 p-5">
             <p className="text-xs uppercase tracking-[0.24em] text-stone-500">Quote Requests</p>
             <p className="mt-3 font-serif text-3xl text-white">
-              {formatDate(availability.quoteNextAvailableDate)}
+              {formatDate(availability.quote.nextAvailableDate)}
             </p>
             <p className="mt-3 text-sm leading-7 text-stone-300">
-              The homepage quote section uses this to set expectations for callbacks and site
-              visits.
+              {availability.quote.bookedCountOnNextDate} booked / {availability.quote.dailyCapacity}{' '}
+              daily capacity. {availability.quote.remainingSlotsOnNextDate} slot
+              {availability.quote.remainingSlotsOnNextDate === 1 ? '' : 's'} open on this date.
             </p>
             <p className="mt-3 text-sm leading-7 text-stone-400">
-              {availability.quoteNote || 'No extra quote note is currently shown to customers.'}
+              {availability.settings.quoteWeekdaysOnly
+                ? 'Quote openings are limited to weekdays.'
+                : 'Quote openings may land on any day of the week.'}{' '}
+              {availability.settings.quoteNote || 'No extra quote note is currently shown to customers.'}
             </p>
           </div>
         </div>
@@ -466,12 +482,26 @@ export default async function AdminReservationsPage({
               <div className="mt-4 space-y-4">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
-                    Next Available Date
+                    Do Not Allow Before
                   </label>
                   <input
-                    name="dumpster15NextAvailableDate"
+                    name="dumpster15ManualFloorDate"
                     type="date"
-                    defaultValue={availability.dumpster15NextAvailableDate}
+                    defaultValue={availability.settings.dumpster15ManualFloorDate}
+                    className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+                    Daily Capacity
+                  </label>
+                  <input
+                    name="dumpster15DailyCapacity"
+                    type="number"
+                    min={1}
+                    step={1}
+                    defaultValue={availability.settings.dumpster15DailyCapacity}
                     className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                   />
                 </div>
@@ -483,7 +513,7 @@ export default async function AdminReservationsPage({
                   <textarea
                     name="dumpster15Note"
                     rows={3}
-                    defaultValue={availability.dumpster15Note}
+                    defaultValue={availability.settings.dumpster15Note}
                     maxLength={400}
                     className="min-h-[7rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                     placeholder="Example: Limited weekday inventory this week. Book early morning deliveries first."
@@ -499,15 +529,41 @@ export default async function AdminReservationsPage({
               <div className="mt-4 space-y-4">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
-                    Next Available Date
+                    Do Not Allow Before
                   </label>
                   <input
-                    name="quoteNextAvailableDate"
+                    name="quoteManualFloorDate"
                     type="date"
-                    defaultValue={availability.quoteNextAvailableDate}
+                    defaultValue={availability.settings.quoteManualFloorDate}
                     className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
+                    Daily Quote Slots
+                  </label>
+                  <input
+                    name="quoteDailyCapacity"
+                    type="number"
+                    min={1}
+                    step={1}
+                    defaultValue={availability.settings.quoteDailyCapacity}
+                    className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
+                  />
+                </div>
+
+                <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-4 text-sm leading-7 text-stone-200">
+                  <input
+                    name="quoteWeekdaysOnly"
+                    type="checkbox"
+                    defaultChecked={availability.settings.quoteWeekdaysOnly}
+                    className="mt-1 h-4 w-4 rounded border-white/20 bg-black text-amber-300 focus:ring-amber-300/40"
+                  />
+                  <span>
+                    Limit quote openings to weekdays only.
+                  </span>
+                </label>
 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-300">
@@ -516,7 +572,7 @@ export default async function AdminReservationsPage({
                   <textarea
                     name="quoteNote"
                     rows={3}
-                    defaultValue={availability.quoteNote}
+                    defaultValue={availability.settings.quoteNote}
                     maxLength={400}
                     className="min-h-[7rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45"
                     placeholder="Example: Quotes are currently opening for the next business day. Include photos if the scope is unusual."

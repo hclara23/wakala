@@ -36,7 +36,9 @@ interface ReservationCheckoutFormProps {
   itemId: CheckoutItemId;
   itemLabel: string;
   buttonLabel: string;
-  nextAvailableDate: AvailabilitySettings['dumpster15NextAvailableDate'];
+  nextAvailableDate: AvailabilitySettings['dumpster15ManualFloorDate'];
+  dailyCapacity: number;
+  remainingSlots: number;
   availabilityNote?: string;
   className?: string;
 }
@@ -61,6 +63,8 @@ export default function ReservationCheckoutForm({
   itemLabel,
   buttonLabel,
   nextAvailableDate,
+  dailyCapacity,
+  remainingSlots,
   availabilityNote,
   className,
 }: ReservationCheckoutFormProps) {
@@ -139,6 +143,10 @@ export default function ReservationCheckoutForm({
         <p className="text-xs uppercase tracking-[0.24em] text-stone-400">Current Availability</p>
         <p className="mt-2 text-white">
           Next available 15-yard dumpster date: {formatDate(minDate)}
+        </p>
+        <p className="mt-2 text-stone-300">
+          {remainingSlots} slot{remainingSlots === 1 ? '' : 's'} open out of {dailyCapacity} on
+          the next available date.
         </p>
         <p className="mt-2 text-stone-300">
           {availabilityNote || 'Choose a preferred delivery date on or after the next available opening.'}

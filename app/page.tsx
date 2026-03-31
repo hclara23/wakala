@@ -4,7 +4,9 @@ import { ArrowRight, CheckCircle2, Phone, ShieldCheck, Sparkles } from 'lucide-r
 import ReservationCheckoutForm from '@/components/ReservationCheckoutForm';
 import Testimonials from '@/components/Testimonials';
 import CreativeContactForm from '@/components/CreativeContactForm';
-import { getAvailabilitySettings } from '@/lib/availability';
+import { buildAvailabilitySnapshot, getAvailabilitySettings } from '@/lib/availability';
+import { listLeads } from '@/lib/leads';
+import { listReservations } from '@/lib/reservations';
 import {
   checkoutItems,
   companyPrinciples,
@@ -15,9 +17,19 @@ import {
 } from '@/lib/site-data';
 
 const paymentItem = checkoutItems.dumpster_15_reservation;
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const availability = await getAvailabilitySettings();
+  const [availabilitySettings, reservations, leads] = await Promise.all([
+    getAvailabilitySettings(),
+    listReservations(),
+    listLeads(),
+  ]);
+  const availability = buildAvailabilitySnapshot({
+    leads,
+    reservations,
+    settings: availabilitySettings,
+  });
 
   return (
     <>
@@ -371,8 +383,10 @@ export default async function Home() {
                 itemId={paymentItem.id}
                 itemLabel={paymentItem.reservationLabel}
                 buttonLabel={paymentItem.buttonLabel}
-                nextAvailableDate={availability.dumpster15NextAvailableDate}
-                availabilityNote={availability.dumpster15Note}
+                nextAvailableDate={availability.dumpster15.nextAvailableDate}
+                dailyCapacity={availability.dumpster15.dailyCapacity}
+                remainingSlots={availability.dumpster15.remainingSlotsOnNextDate}
+                availabilityNote={availability.settings.dumpster15Note}
                 className="mt-8"
               />
             </div>
@@ -390,8 +404,11 @@ export default async function Home() {
               </p>
             </div>
             <CreativeContactForm
-              nextAvailableDate={availability.quoteNextAvailableDate}
-              availabilityNote={availability.quoteNote}
+              nextAvailableDate={availability.quote.nextAvailableDate}
+              dailyCapacity={availability.quote.dailyCapacity}
+              remainingSlots={availability.quote.remainingSlotsOnNextDate}
+              weekdaysOnly={availability.quote.weekdaysOnly}
+              availabilityNote={availability.settings.quoteNote}
             />
           </div>
         </div>

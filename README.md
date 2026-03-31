@@ -73,9 +73,11 @@ Both directories are ignored by Git.
 
 ## Availability Controls
 
-- `/admin/reservations` includes booking controls for the next available 15-yard dumpster date and the next available quote opening.
-- The homepage booking section shows those availability dates to customers.
-- The checkout API rejects dumpster preferred dates that are earlier than the admin-set next available date.
+- `/admin/reservations` includes smart booking controls for the next available 15-yard dumpster date and the next available quote opening.
+- Dumpster openings are computed from scheduled reservation dates plus the configured daily dumpster capacity.
+- Quote openings are computed from scheduled lead follow-up dates plus the configured daily quote capacity.
+- The homepage booking section shows those computed opening dates to customers.
+- The checkout API rejects dumpster preferred dates that are earlier than the allowed floor date or already full for the selected day.
 
 ## Quote And Lead Flow
 

@@ -83,18 +83,24 @@ export async function updateReservationAction(formData: FormData) {
 export async function updateAvailabilityAction(formData: FormData) {
   await requireAdminSession();
 
-  const dumpster15NextAvailableDate = String(
-    formData.get('dumpster15NextAvailableDate') || ''
+  const dumpster15ManualFloorDate = String(
+    formData.get('dumpster15ManualFloorDate') || ''
   ).trim();
+  const dumpster15DailyCapacity = Number(formData.get('dumpster15DailyCapacity') || 0);
   const dumpster15Note = String(formData.get('dumpster15Note') || '').trim();
-  const quoteNextAvailableDate = String(formData.get('quoteNextAvailableDate') || '').trim();
+  const quoteManualFloorDate = String(formData.get('quoteManualFloorDate') || '').trim();
+  const quoteDailyCapacity = Number(formData.get('quoteDailyCapacity') || 0);
+  const quoteWeekdaysOnly = formData.get('quoteWeekdaysOnly') === 'on';
   const quoteNote = String(formData.get('quoteNote') || '').trim();
 
   try {
     await updateAvailabilitySettings({
-      dumpster15NextAvailableDate,
+      dumpster15ManualFloorDate,
+      dumpster15DailyCapacity,
       dumpster15Note,
-      quoteNextAvailableDate,
+      quoteManualFloorDate,
+      quoteDailyCapacity,
+      quoteWeekdaysOnly,
       quoteNote,
     });
   } catch (error: unknown) {

@@ -18,6 +18,9 @@ import { trackEvent } from '@/lib/gtag';
 
 type CreativeContactFormProps = {
   nextAvailableDate: string;
+  dailyCapacity: number;
+  remainingSlots: number;
+  weekdaysOnly: boolean;
   availabilityNote?: string;
 };
 
@@ -38,6 +41,9 @@ function formatDate(value: string) {
 
 export default function CreativeContactForm({
   nextAvailableDate,
+  dailyCapacity,
+  remainingSlots,
+  weekdaysOnly,
   availabilityNote,
 }: CreativeContactFormProps) {
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -121,6 +127,10 @@ export default function CreativeContactForm({
         <div className="mt-5 rounded-[1.5rem] border border-sky-400/20 bg-sky-400/8 p-4 text-sm leading-6 text-stone-200">
           <p className="text-xs uppercase tracking-[0.24em] text-stone-400">Quote Availability</p>
           <p className="mt-2 text-white">Next available quote opening: {formatDate(nextAvailableDate)}</p>
+          <p className="mt-2 text-stone-300">
+            {remainingSlots} slot{remainingSlots === 1 ? '' : 's'} open out of {dailyCapacity} on
+            the next quote day. {weekdaysOnly ? 'Quote openings are limited to weekdays.' : 'Quote openings may land on any day.'}
+          </p>
           <p className="mt-2 text-stone-300">
             {availabilityNote || 'Use this form to lock in the next open quote slot for your project.'}
           </p>
