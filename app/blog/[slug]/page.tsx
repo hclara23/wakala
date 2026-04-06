@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, Phone, Sparkles } from 'lucide-react';
+import { ArrowRight, Phone, Sparkles, Share2 } from 'lucide-react';
 import { Reveal } from '@/components/PageMotion';
+import { ShareButtons } from '@/components/ShareButtons';
 import { getSiteImageSrc } from '@/lib/site-images';
 import { blogPosts, getBlogPost, site } from '@/lib/site-data';
 
@@ -276,6 +277,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </section>
             </Reveal>
 
+            <Reveal delay={0.11}>
+              <ShareButtons
+                url={`${site.url}/blog/${post.slug}`}
+                title={post.title}
+                variant="bottom"
+                className="mt-8 mb-12"
+              />
+            </Reveal>
+
             {relatedPosts.length ? (
               <Reveal delay={0.12}>
                 <section className="space-y-6">
@@ -321,9 +331,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div className="space-y-6 xl:sticky xl:top-28 xl:self-start">
             <Reveal delay={0.04}>
-              <aside className="panel rounded-[2rem] p-6">
-                <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Article Guide</p>
-                <div className="mt-5 space-y-3 text-sm leading-7 text-stone-300">
+              <aside className="panel rounded-[2rem] p-6 space-y-6">
+                <ShareButtons
+                  url={`${site.url}/blog/${post.slug}`}
+                  title={post.title}
+                  variant="sidebar"
+                />
+
+                <div className="border-t border-white/10 pt-6">
+                  <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Article Guide</p>
+                  <div className="mt-5 space-y-3 text-sm leading-7 text-stone-300">
                   <p>
                     <span className="text-stone-100">Published:</span> {formatPublishedDate(post.publishedAt)}
                   </p>
@@ -334,6 +351,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                     <span className="text-stone-100">Focus:</span> {post.tags.join(', ')}
                   </p>
                 </div>
+              </div>
                 <div className="mt-6 border-t border-white/10 pt-6">
                   <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Jump To</p>
                   <div className="mt-4 space-y-3">
