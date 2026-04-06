@@ -383,6 +383,85 @@ export type BlogPost = {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'essential-steps-for-a-total-property-reset-in-el-paso',
+    title: 'Essential Steps for a Total Property Reset in El Paso',
+    excerpt:
+      'Whether you are preparing a house for sale, managing a rental turnover, or recovering from a storm, a total property reset restores value and control fast.',
+    description:
+      'Learn the essential steps for a full property reset in El Paso, from debris removal and yard cleanup to pressure washing and minor repairs.',
+    publishedAt: '2026-04-06',
+    readingTime: '6 min read',
+    coverImage: blogImageAssets.propertyReset,
+    coverAlt: 'A property undergoing a professional reset and cleanup.',
+    tags: ['Property Reset', 'Cleanup', 'El Paso'],
+    keywords: [
+      'property reset El Paso',
+      'rental turnover cleanup',
+      'foreclosure cleanup',
+      'estate cleanout help',
+    ],
+    takeaways: [
+      'A property reset is about more than just cleaning; it is about restoring the asset\'s utility and market appeal.',
+      'Proper sequencing—starting with big debris and ending with fine cleaning—saves time and money.',
+      'Combining hauling, repairs, and washing under one coordinator prevents scheduling gaps.',
+    ],
+    sections: [
+      {
+        heading: 'Phase 1: Major Debris and Junk Removal',
+        paragraphs: [
+          'The first step to any reset is clearing the "big stuff." Whether it is leftover tenant furniture, construction debris, or storm-damaged structures, you cannot see the real condition of the property until the clutter is gone.',
+          'Wakala uses 15-yard roll-offs and heavy-duty trailers to clear sites in hours, not days. This phase is about reclaimed space and safety.',
+        ],
+        image: galleryImageAssets.debrisRemoval,
+        imageAlt: 'A large pile of debris being cleared from a residential property.',
+      },
+      {
+        heading: 'Phase 2: Yard and Landscape Restoration',
+        paragraphs: [
+          'Once the trash is gone, the "green" work begins. In El Paso, wind and sun can make a yard look abandoned in weeks. We focus on overgrowth removal, weed control, and clearing dead vegetation that poses a fire or pest risk.',
+          'Cleaning the yard changes the curb appeal immediately, making the property look managed rather than abandoned.',
+        ],
+        image: galleryImageAssets.yardCleanup,
+        imageAlt: 'Professional yard cleanup crew clearing overgrowth and desert landscape.',
+      },
+      {
+        heading: 'Phase 3: Exterior Surface Pressure Washing',
+        paragraphs: [
+          'Dust and grime are part of life in the desert. A deep pressure wash of the driveway, walkways, and siding removes splotches and buildup that standard cleaning misses.',
+          'We target high-visibility areas to ensure that every entry point feels fresh and welcoming to new tenants or buyers.',
+        ],
+        image: galleryImageAssets.propertyPressureWashing,
+        imageAlt: 'Pressure washing a concrete driveway to remove years of dust and stains.',
+      },
+      {
+        heading: 'Phase 4: Targeted Handyman Repairs and Touchups',
+        paragraphs: [
+          'The final touch is fixing the small things that distract the eye. Drywall patches, fixture swaps, and paint touchups complete the transformation.',
+          'By handling these "punch list" items alongside the cleanup, Wakala delivers a property that is truly ready for its next occupant.',
+        ],
+        image: galleryImageAssets.smallRepairsInterior,
+        imageAlt: 'Interior repair work completing the property reset process.',
+      },
+    ],
+    faq: [
+      {
+        question: 'How long does a full property reset take?',
+        answer:
+          'Most residential resets are completed in 1–3 days depending on the volume of debris and the number of repairs required.',
+      },
+      {
+        question: 'Can I choose specific phases or do I need the full package?',
+        answer:
+          'Wakala offers flexible scheduling. You can book just the hauling, just the washing, or the entire end-to-end reset sequence.',
+      },
+      {
+        question: 'Is this service available for commercial properties?',
+        answer:
+          'Yes, we provide reset services for commercial pad sites, retail storefronts, and rental complexes across El Paso.',
+      },
+    ],
+  },
+  {
     slug: 'how-to-choose-the-right-dumpster-size-for-an-el-paso-cleanout',
     title: 'How to Choose the Right Dumpster Size for an El Paso Cleanout',
     excerpt:
@@ -764,85 +843,6 @@ export const blogPosts: BlogPost[] = [
         question: 'What happens to all the debris?',
         answer:
           'We use our own roll-off dumpsters and trailers to ensure all debris is removed quickly and disposed of properly.',
-      },
-    ],
-  },
-  {
-    slug: 'essential-steps-for-a-total-property-reset-in-el-paso',
-    title: 'Essential Steps for a Total Property Reset in El Paso',
-    excerpt:
-      'Whether you are preparing a house for sale, managing a rental turnover, or recovering from a storm, a total property reset restores value and control fast.',
-    description:
-      'Learn the essential steps for a full property reset in El Paso, from debris removal and yard cleanup to pressure washing and minor repairs.',
-    publishedAt: '2026-04-06',
-    readingTime: '6 min read',
-    coverImage: blogImageAssets.propertyReset,
-    coverAlt: 'A property undergoing a professional reset and cleanup.',
-    tags: ['Property Reset', 'Cleanup', 'El Paso'],
-    keywords: [
-      'property reset El Paso',
-      'rental turnover cleanup',
-      'foreclosure cleanup',
-      'estate cleanout help',
-    ],
-    takeaways: [
-      'A property reset is about more than just cleaning; it is about restoring the asset\'s utility and market appeal.',
-      'Proper sequencing—starting with big debris and ending with fine cleaning—saves time and money.',
-      'Combining hauling, repairs, and washing under one coordinator prevents scheduling gaps.',
-    ],
-    sections: [
-      {
-        heading: 'Phase 1: Major Debris and Junk Removal',
-        paragraphs: [
-          'The first step to any reset is clearing the "big stuff." Whether it is leftover tenant furniture, construction debris, or storm-damaged structures, you cannot see the real condition of the property until the clutter is gone.',
-          'Wakala uses 15-yard roll-offs and heavy-duty trailers to clear sites in hours, not days. This phase is about reclaimed space and safety.',
-        ],
-        image: galleryImageAssets.debrisRemoval,
-        imageAlt: 'A large pile of debris being cleared from a residential property.',
-      },
-      {
-        heading: 'Phase 2: Yard and Landscape Restoration',
-        paragraphs: [
-          'Once the trash is gone, the "green" work begins. In El Paso, wind and sun can make a yard look abandoned in weeks. We focus on overgrowth removal, weed control, and clearing dead vegetation that poses a fire or pest risk.',
-          'Cleaning the yard changes the curb appeal immediately, making the property look managed rather than abandoned.',
-        ],
-        image: galleryImageAssets.yardCleanup,
-        imageAlt: 'Professional yard cleanup crew clearing overgrowth and desert landscape.',
-      },
-      {
-        heading: 'Phase 3: Exterior Surface Pressure Washing',
-        paragraphs: [
-          'Dust and grime are part of life in the desert. A deep pressure wash of the driveway, walkways, and siding removes splotches and buildup that standard cleaning misses.',
-          'We target high-visibility areas to ensure that every entry point feels fresh and welcoming to new tenants or buyers.',
-        ],
-        image: galleryImageAssets.propertyPressureWashing,
-        imageAlt: 'Pressure washing a concrete driveway to remove years of dust and stains.',
-      },
-      {
-        heading: 'Phase 4: Targeted Handyman Repairs and Touchups',
-        paragraphs: [
-          'The final touch is fixing the small things that distract the eye. Drywall patches, fixture swaps, and paint touchups complete the transformation.',
-          'By handling these "punch list" items alongside the cleanup, Wakala delivers a property that is truly ready for its next occupant.',
-        ],
-        image: galleryImageAssets.smallRepairsInterior,
-        imageAlt: 'Interior repair work completing the property reset process.',
-      },
-    ],
-    faq: [
-      {
-        question: 'How long does a full property reset take?',
-        answer:
-          'Most residential resets are completed in 1–3 days depending on the volume of debris and the number of repairs required.',
-      },
-      {
-        question: 'Can I choose specific phases or do I need the full package?',
-        answer:
-          'Wakala offers flexible scheduling. You can book just the hauling, just the washing, or the entire end-to-end reset sequence.',
-      },
-      {
-        question: 'Is this service available for commercial properties?',
-        answer:
-          'Yes, we provide reset services for commercial pad sites, retail storefronts, and rental complexes across El Paso.',
       },
     ],
   },
